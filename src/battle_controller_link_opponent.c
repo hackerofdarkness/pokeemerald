@@ -1,30 +1,30 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_ai_script_commands.h"
-#include "battle_anim.h"
 #include "battle_controllers.h"
-#include "battle_interface.h"
 #include "battle_message.h"
-#include "battle_setup.h"
-#include "battle_tv.h"
-#include "bg.h"
-#include "data2.h"
-#include "link.h"
-#include "main.h"
-#include "m4a.h"
-#include "palette.h"
-#include "pokeball.h"
-#include "pokemon.h"
-#include "reshow_battle_screen.h"
-#include "sound.h"
-#include "string_util.h"
-#include "task.h"
-#include "text.h"
-#include "util.h"
-#include "window.h"
+#include "battle_interface.h"
+#include "battle_anim.h"
 #include "constants/battle_anim.h"
+#include "battle_ai_script_commands.h"
+#include "battle_tv.h"
+#include "pokemon.h"
+#include "link.h"
+#include "util.h"
+#include "main.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
+#include "sound.h"
+#include "window.h"
+#include "m4a.h"
+#include "palette.h"
+#include "task.h"
+#include "text.h"
+#include "string_util.h"
+#include "bg.h"
+#include "reshow_battle_screen.h"
+#include "pokeball.h"
+#include "data2.h"
+#include "battle_setup.h"
 
 extern u16 gBattle_BG0_X;
 extern u16 gBattle_BG0_Y;
@@ -95,6 +95,7 @@ static void LinkOpponentHandleBattleAnimation(void);
 static void LinkOpponentHandleLinkStandbyMsg(void);
 static void LinkOpponentHandleResetActionMoveSelection(void);
 static void LinkOpponentHandleCmd55(void);
+static void LinkOpponentHandleBattleDebug(void);
 static void nullsub_92(void);
 
 static void LinkOpponentBufferRunCommand(void);
@@ -167,6 +168,7 @@ static void (*const sLinkOpponentBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     LinkOpponentHandleLinkStandbyMsg,
     LinkOpponentHandleResetActionMoveSelection,
     LinkOpponentHandleCmd55,
+    LinkOpponentHandleBattleDebug,
     nullsub_92
 };
 
@@ -1858,6 +1860,11 @@ static void LinkOpponentHandleCmd55(void)
     BeginFastPaletteFade(3);
     LinkOpponentBufferExecCompleted();
     gBattlerControllerFuncs[gActiveBattler] = sub_80587B0;
+}
+
+static void LinkOpponentHandleBattleDebug(void)
+{
+    LinkOpponentBufferExecCompleted();
 }
 
 static void nullsub_92(void)

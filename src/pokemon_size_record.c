@@ -1,10 +1,10 @@
 #include "global.h"
-#include "event_data.h"
-#include "pokemon.h"
 #include "pokemon_size_record.h"
+#include "event_data.h"
+#include "constants/species.h"
 #include "string_util.h"
 #include "text.h"
-#include "constants/species.h"
+#include "pokemon.h"
 
 #define DEFAULT_MAX_SIZE 0x8000 // was 0x8100 in Ruby/Sapphire
 

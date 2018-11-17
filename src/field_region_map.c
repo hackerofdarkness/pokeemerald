@@ -1,16 +1,18 @@
+
+// Includes
 #include "global.h"
-#include "bg.h"
-#include "gpu_regs.h"
-#include "international_string_util.h"
 #include "main.h"
 #include "malloc.h"
-#include "menu.h"
-#include "palette.h"
-#include "region_map.h"
-#include "strings.h"
+#include "gpu_regs.h"
+#include "bg.h"
 #include "text.h"
-#include "text_window.h"
 #include "window.h"
+#include "text_window.h"
+#include "palette.h"
+#include "menu.h"
+#include "strings.h"
+#include "international_string_util.h"
+#include "region_map.h"
 
 // Static type declarations
 

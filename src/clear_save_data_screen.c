@@ -86,7 +86,7 @@ static void Task_DoClearSaveDataScreenYesNo(u8 taskId)
 
 static void Task_ClearSaveDataScreenYesNoChoice(u8 taskId)
 {
-    switch(Menu_ProcessInputNoWrapClearOnChoose())
+    switch(Menu_ProcessInputNoWrap_())
     {
         case 0:
             FillWindowPixelBuffer(0, 17);

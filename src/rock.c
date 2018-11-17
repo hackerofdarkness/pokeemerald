@@ -259,6 +259,17 @@ const struct SpriteTemplate gUnknown_08596C98 =
     .callback = sub_8111418,
 };
 
+const struct SpriteTemplate gAuraSphereCircle =
+{
+	.tileTag = ANIM_TAG_CIRCLE_OF_LIGHT,
+	.paletteTag = ANIM_TAG_CIRCLE_OF_LIGHT,
+	.oam = &gUnknown_08524974,
+	.anims = gUnknown_08596BF8,
+	.images = NULL,
+	.affineAnims = gUnknown_08596C90,
+	.callback = sub_8111418,
+};
+
 const struct SpriteTemplate gUnknown_08596CB0 =
 {
     .tileTag = ANIM_TAG_ROCKS,

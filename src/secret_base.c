@@ -998,7 +998,7 @@ void sub_80E9FB0(u8 taskId)
 {
     s8 input;
 
-    input = Menu_ProcessInputNoWrap();
+    input = Menu_ProcessInputNoWrapAround();
     switch (input)
     {
         case -1:
@@ -1032,7 +1032,7 @@ void sub_80E9FFC(u8 taskId)
 
 void sub_80EA06C(u8 taskId)
 {
-    DisplayYesNoMenu();
+    sub_8197930();
     sub_8121F68(taskId, &gUnknown_0858D058);
 }
 

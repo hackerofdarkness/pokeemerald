@@ -1,30 +1,30 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_ai_script_commands.h"
-#include "battle_anim.h"
 #include "battle_controllers.h"
 #include "battle_message.h"
 #include "battle_interface.h"
-#include "battle_setup.h"
-#include "bg.h"
-#include "data2.h"
-#include "item_use.h"
-#include "link.h"
-#include "main.h"
-#include "m4a.h"
-#include "palette.h"
-#include "pokeball.h"
-#include "pokemon.h"
-#include "reshow_battle_screen.h"
-#include "sound.h"
-#include "string_util.h"
-#include "task.h"
-#include "text.h"
-#include "util.h"
-#include "window.h"
+#include "battle_anim.h"
 #include "constants/battle_anim.h"
+#include "battle_ai_script_commands.h"
+#include "pokemon.h"
+#include "link.h"
+#include "util.h"
+#include "main.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
+#include "sound.h"
+#include "window.h"
+#include "m4a.h"
+#include "palette.h"
+#include "task.h"
+#include "text.h"
+#include "string_util.h"
+#include "bg.h"
+#include "reshow_battle_screen.h"
+#include "pokeball.h"
+#include "data2.h"
+#include "battle_setup.h"
+#include "item_use.h"
 
 extern u16 gBattle_BG0_X;
 extern u16 gBattle_BG0_Y;
@@ -95,6 +95,7 @@ static void PlayerPartnerHandleBattleAnimation(void);
 static void PlayerPartnerHandleLinkStandbyMsg(void);
 static void PlayerPartnerHandleResetActionMoveSelection(void);
 static void PlayerPartnerHandleCmd55(void);
+static void PlayerPartnerHandleBattleDebug(void);
 static void nullsub_128(void);
 
 static void PlayerPartnerBufferRunCommand(void);
@@ -172,6 +173,7 @@ static void (*const sPlayerPartnerBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     PlayerPartnerHandleLinkStandbyMsg,
     PlayerPartnerHandleResetActionMoveSelection,
     PlayerPartnerHandleCmd55,
+    PlayerPartnerHandleBattleDebug,
     nullsub_128
 };
 
@@ -1931,6 +1933,11 @@ static void PlayerPartnerHandleCmd55(void)
     BeginFastPaletteFade(3);
     PlayerPartnerBufferExecCompleted();
     gBattlerControllerFuncs[gActiveBattler] = sub_80587B0;
+}
+
+static void PlayerPartnerHandleBattleDebug(void)
+{
+    PlayerPartnerBufferExecCompleted();
 }
 
 static void nullsub_128(void)

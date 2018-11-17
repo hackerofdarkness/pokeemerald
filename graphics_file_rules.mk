@@ -21,7 +21,7 @@ PSSGFXDIR := graphics/pokemon_storage
 EVENTOBJGFXDIR := graphics/event_objects
 MISCGFXDIR := graphics/misc
 
-types := normal fight flying poison ground rock bug ghost steel mystery fire water grass electric psychic ice dragon dark
+types := normal fight flying poison ground rock bug ghost steel mystery fire water grass electric psychic ice dragon dark fairy
 contest_types := cool beauty cute smart tough
 
 $(MONSTILLFRONTGFXDIR)/castform_still_front_pic.4bpp: $(MONSTILLFRONTGFXDIR)/castform_normal_form_still_front_pic.4bpp \
@@ -304,7 +304,7 @@ graphics/link_games/pkmnjump_bg.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 63
 
 graphics/pokenav/region_map.8bpp: %.8bpp: %.png
-	$(GFX) $< $@ -num_tiles 233
+	$(GFX) $< $@ -num_tiles 239
 
 $(MISCGFXDIR)/japanese_hof.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 29
@@ -662,10 +662,10 @@ $(PKNAVGFXDIR)/ui_matchcall.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 13
 
 $(INTERFACEGFXDIR)/region_map.8bpp: %.8bpp: %.png
-	$(GFX) $< $@ -num_tiles 232
+	$(GFX) $< $@ -num_tiles 239
 
 $(INTERFACEGFXDIR)/region_map_affine.8bpp: %.8bpp: %.png
-	$(GFX) $< $@ -num_tiles 233
+	$(GFX) $< $@ -num_tiles 239
 
 $(MISCGFXDIR)/birch_help.4bpp: $(MISCGFXDIR)/birch_bag.4bpp $(MISCGFXDIR)/birch_grass.4bpp
 	@cat $^ >$@

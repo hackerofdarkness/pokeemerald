@@ -1,35 +1,35 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_anim.h"
 #include "battle_controllers.h"
-#include "battle_interface.h"
 #include "battle_message.h"
-#include "battle_setup.h"
+#include "battle_interface.h"
+#include "battle_anim.h"
+#include "constants/battle_anim.h"
 #include "battle_tv.h"
-#include "bg.h"
-#include "data2.h"
-#include "item.h"
-#include "item_menu.h"
+#include "pokemon.h"
 #include "link.h"
+#include "util.h"
 #include "main.h"
+#include "item.h"
+#include "constants/items.h"
+#include "constants/songs.h"
+#include "sound.h"
+#include "constants/moves.h"
+#include "constants/trainers.h"
+#include "window.h"
 #include "m4a.h"
 #include "palette.h"
-#include "party_menu.h"
-#include "pokeball.h"
-#include "pokemon.h"
-#include "random.h"
-#include "reshow_battle_screen.h"
-#include "sound.h"
-#include "string_util.h"
 #include "task.h"
 #include "text.h"
-#include "util.h"
-#include "window.h"
-#include "constants/battle_anim.h"
-#include "constants/items.h"
-#include "constants/moves.h"
-#include "constants/songs.h"
-#include "constants/trainers.h"
+#include "string_util.h"
+#include "bg.h"
+#include "reshow_battle_screen.h"
+#include "random.h"
+#include "pokeball.h"
+#include "data2.h"
+#include "party_menu.h"
+#include "battle_setup.h"
+#include "item_menu.h"
 
 extern u16 gBattle_BG0_X;
 extern u16 gBattle_BG0_Y;
@@ -97,6 +97,7 @@ static void WallyHandleBattleAnimation(void);
 static void WallyHandleLinkStandbyMsg(void);
 static void WallyHandleResetActionMoveSelection(void);
 static void WallyHandleCmd55(void);
+static void WallyHandleBattleDebug(void);
 static void nullsub_118(void);
 
 static void WallyBufferRunCommand(void);
@@ -166,6 +167,7 @@ static void (*const sWallyBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     WallyHandleLinkStandbyMsg,
     WallyHandleResetActionMoveSelection,
     WallyHandleCmd55,
+    WallyHandleBattleDebug,
     nullsub_118
 };
 
@@ -1562,6 +1564,11 @@ static void WallyHandleCmd55(void)
 
     if (!(gBattleTypeFlags & BATTLE_TYPE_IS_MASTER) && gBattleTypeFlags & BATTLE_TYPE_LINK)
         gBattlerControllerFuncs[gActiveBattler] = sub_80587B0;
+}
+
+static void WallyHandleBattleDebug(void)
+{
+    WallyBufferExecCompleted();
 }
 
 static void nullsub_118(void)

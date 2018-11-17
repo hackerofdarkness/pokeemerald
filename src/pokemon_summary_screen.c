@@ -2,7 +2,7 @@
 #include "main.h"
 #include "battle.h"
 #include "battle_anim.h"
-#include "frontier_util.h"
+#include "battle_frontier_2.h"
 #include "battle_message.h"
 #include "battle_tent.h"
 #include "bg.h"
@@ -44,8 +44,6 @@
 #include "constants/region_map_sections.h"
 #include "constants/songs.h"
 #include "constants/species.h"
-
-extern bool8 sub_81A6BF4(void);
 
 static EWRAM_DATA struct UnkSummaryStruct
 {
@@ -109,6 +107,7 @@ static EWRAM_DATA struct UnkSummaryStruct
     bool8 unk40EF;
     s16 unk40F0;
     u8 unk_filler4[6];
+    u8 splitIconSpriteId;
 } *pssData = NULL;
 EWRAM_DATA u8 gUnknown_0203CF20 = 0;
 static EWRAM_DATA u8 gUnknown_0203CF21 = 0;
@@ -252,6 +251,77 @@ static void sub_81C4C84(u8 a);
 static void sub_81C4D18(u8 a);
 
 // const rom data
+#define SPLIT_ICONS_TAG 0xD00D
+
+static const u16 sSplitIconsPal[] = INCBIN_U16("graphics/misc/split_icons.gbapal");
+static const u8 sSplitIconsTiles[] = INCBIN_U8("graphics/misc/split_icons.4bpp");
+
+static const struct OamData sOamData_SplitIcons =
+{
+    .y = 0,
+    .affineMode = 0,
+    .objMode = 0,
+    .mosaic = 0,
+    .bpp = 0,
+    .shape = 0,
+    .x = 0,
+    .matrixNum = 0,
+    .size = 1,
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const struct SpriteSheet sSpriteSheet_SplitIcons =
+{
+    .data = sSplitIconsTiles,
+    .size = 400,
+    .tag = SPLIT_ICONS_TAG,
+};
+
+static const struct SpritePalette sSpritePal_SplitIcons =
+{
+    .data = sSplitIconsPal,
+    .tag = SPLIT_ICONS_TAG
+};
+
+static const union AnimCmd sSpriteAnim_SplitIcon0[] =
+{
+    ANIMCMD_FRAME(0, 0),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sSpriteAnim_SplitIcon1[] =
+{
+    ANIMCMD_FRAME(4, 0),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sSpriteAnim_SplitIcon2[] =
+{
+    ANIMCMD_FRAME(8, 0),
+    ANIMCMD_END
+};
+
+static const union AnimCmd *const sSpriteAnimTable_SplitIcons[] =
+{
+    sSpriteAnim_SplitIcon0,
+    sSpriteAnim_SplitIcon1,
+    sSpriteAnim_SplitIcon2,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_SplitIcons =
+{
+    .tileTag = SPLIT_ICONS_TAG,
+    .paletteTag = SPLIT_ICONS_TAG,
+    .oam = &sOamData_SplitIcons,
+    .anims = sSpriteAnimTable_SplitIcons,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+
 #include "data/text/move_descriptions.h"
 #include "data/text/nature_names.h"
 
@@ -742,6 +812,10 @@ static const union AnimCmd sSpriteAnim_TypeDark[] = {
     ANIMCMD_FRAME(TYPE_DARK * 8, 0, FALSE, FALSE),
     ANIMCMD_END
 };
+static const union AnimCmd sSpriteAnim_TypeFairy[] = {
+    ANIMCMD_FRAME(TYPE_FAIRY * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
 static const union AnimCmd sSpriteAnim_CategoryCool[] = {
     ANIMCMD_FRAME((CONTEST_CATEGORY_COOL + NUMBER_OF_MON_TYPES) * 8, 0, FALSE, FALSE),
     ANIMCMD_END
@@ -781,6 +855,7 @@ static const union AnimCmd *const sSpriteAnimTable_MoveTypes[NUMBER_OF_MON_TYPES
     sSpriteAnim_TypeIce,
     sSpriteAnim_TypeDragon,
     sSpriteAnim_TypeDark,
+    sSpriteAnim_TypeFairy,
     sSpriteAnim_CategoryCool,
     sSpriteAnim_CategoryBeauty,
     sSpriteAnim_CategoryCute,
@@ -824,6 +899,7 @@ static const u8 sMoveTypeToOamPaletteNum[NUMBER_OF_MON_TYPES + CONTEST_CATEGORIE
     [TYPE_ICE] = 14,
     [TYPE_DRAGON] = 15,
     [TYPE_DARK] = 13,
+    [TYPE_FAIRY] = 14,
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_COOL] = 13,
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_BEAUTY] = 14,
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_CUTE] = 14,
@@ -996,6 +1072,28 @@ static const struct SpriteTemplate sSpriteTemplate_StatusCondition =
 static const u16 gUnknown_0861D120[] = INCBIN_U16("graphics/interface/summary_markings.gbapal");
 
 // code
+static u8 ShowSplitIcon(u8 split)
+{
+    if (IndexOfSpritePaletteTag(SPLIT_ICONS_TAG) == 0xFF)
+        LoadSpritePalette(&sSpritePal_SplitIcons);
+    if (GetSpriteTileStartByTag(SPLIT_ICONS_TAG) == 0xFFFF)
+        LoadSpriteSheet(&sSpriteSheet_SplitIcons);
+    if (pssData->splitIconSpriteId == 0xFF)
+        pssData->splitIconSpriteId = CreateSprite(&sSpriteTemplate_SplitIcons, 48, 129, 0);
+
+    StartSpriteAnim(&gSprites[pssData->splitIconSpriteId], split);
+    return pssData->splitIconSpriteId;
+}
+
+static void DestroySplitIcon(void)
+{
+    FreeSpritePaletteByTag(SPLIT_ICONS_TAG);
+    FreeSpriteTilesByTag(SPLIT_ICONS_TAG);
+    if (pssData->splitIconSpriteId != 0xFF)
+        DestroySprite(&gSprites[pssData->splitIconSpriteId]);
+    pssData->splitIconSpriteId = 0xFF;
+}
+
 void ShowPokemonSummaryScreen(u8 mode, void *mons, u8 monIndex, u8 maxMonIndex, void (*callback)(void))
 {
     pssData = AllocZeroed(sizeof(*pssData));
@@ -1004,6 +1102,7 @@ void ShowPokemonSummaryScreen(u8 mode, void *mons, u8 monIndex, u8 maxMonIndex, 
     pssData->curMonIndex = monIndex;
     pssData->maxMonIndex = maxMonIndex;
     pssData->callback = callback;
+    pssData->splitIconSpriteId = 0xFF;
 
     if (mode == PSS_MODE_UNK2)
         pssData->isBoxMon = TRUE;
@@ -1229,28 +1328,28 @@ static bool8 SummaryScreen_DecompressGraphics(void)
     case 1:
         if (free_temp_tile_data_buffers_if_possible() != 1)
         {
-            LZDecompressWram(gUnknown_08D9862C, pssData->bgTilemapBuffers[PSS_PAGE_INFO][0]);
+            LZDecompressWram(&gUnknown_08D9862C, pssData->bgTilemapBuffers[PSS_PAGE_INFO][0]);
             pssData->unk40F0++;
         }
         break;
     case 2:
-        LZDecompressWram(gUnknown_08D98CC8, pssData->bgTilemapBuffers[PSS_PAGE_INFO][1]);
+        LZDecompressWram(&gUnknown_08D98CC8, pssData->bgTilemapBuffers[PSS_PAGE_INFO][1]);
         pssData->unk40F0++;
         break;
     case 3:
-        LZDecompressWram(gUnknown_08D987FC, pssData->bgTilemapBuffers[PSS_PAGE_SKILLS][1]);
+        LZDecompressWram(&gUnknown_08D987FC, pssData->bgTilemapBuffers[PSS_PAGE_SKILLS][1]);
         pssData->unk40F0++;
         break;
     case 4:
-        LZDecompressWram(gUnknown_08D9898C, pssData->bgTilemapBuffers[PSS_PAGE_BATTLE_MOVES][1]);
+        LZDecompressWram(&gUnknown_08D9898C, pssData->bgTilemapBuffers[PSS_PAGE_BATTLE_MOVES][1]);
         pssData->unk40F0++;
         break;
     case 5:
-        LZDecompressWram(gUnknown_08D98B28, pssData->bgTilemapBuffers[PSS_PAGE_CONTEST_MOVES][1]);
+        LZDecompressWram(&gUnknown_08D98B28, pssData->bgTilemapBuffers[PSS_PAGE_CONTEST_MOVES][1]);
         pssData->unk40F0++;
         break;
     case 6:
-        LoadCompressedPalette(gUnknown_08D9853C, 0, 0x100);
+        LoadCompressedPalette(&gUnknown_08D9853C, 0, 0x100);
         LoadPalette(&gUnknown_08D85620, 0x81, 0x1E);
         pssData->unk40F0++;
         break;
@@ -1904,6 +2003,7 @@ static void sub_81C1070(s16 *a, s8 b, u8 *c)
     {
         ClearWindowTilemap(14);
         ClearWindowTilemap(15);
+        DestroySplitIcon();
         schedule_bg_copy_tilemap_to_vram(0);
         sub_81C1DA4(0, 3);
         sub_81C1EFC(0, 3, 0);
@@ -1928,6 +2028,7 @@ static void sub_81C11F4(u8 taskId)
     {
         ClearWindowTilemap(14);
         ClearWindowTilemap(15);
+        DestroySplitIcon();
         sub_81C1DA4(0, 3);
         sub_81C1EFC(0, 3, 0);
     }
@@ -3572,6 +3673,8 @@ static void PrintMoveDetails(u16 move)
     {
         if (pssData->currPageIndex == 2)
         {
+            if (move != 0)
+                ShowSplitIcon(gBattleMoves[move].split);
             PrintMovePowerAndAccuracy(move);
             SummaryScreen_PrintTextOnWindow(windowId, gMoveDescriptionPointers[move - 1], 6, 1, 0, 0);
         }

@@ -32,7 +32,6 @@
 #include "tv.h"
 #include "item_menu.h"
 #include "battle_records.h"
-#include "graphics.h"
 
 #define BLENDER_SCORE_BEST      0
 #define BLENDER_SCORE_GOOD      1
@@ -134,6 +133,18 @@ extern struct MusicPlayerInfo gMPlayInfo_SE2;
 extern struct MusicPlayerInfo gMPlayInfo_BGM;
 extern u8 gInGameOpponentsNo;
 extern u8 gUnknown_020322D5;
+
+// graphics
+extern const u8 gBerryBlenderArrowTiles[];
+extern const u8 gBerryBlenderStartTiles[];
+extern const u8 gBerryBlenderMarubatsuTiles[];
+extern const u8 gBerryBlenderParticlesTiles[];
+extern const u8 gBerryBlenderCountdownNumbersTiles[];
+extern const u16 gBerryBlenderMiscPalette[];
+extern const u16 gBerryBlenderArrowPalette[];
+extern const u8 sBlenderCenterGfx[];
+extern const u8 gUnknown_08D91DB8[];
+extern const u8 gUnknown_08D927EC[];
 
 // text
 extern const u8 gText_SavingDontTurnOff2[];
@@ -1020,7 +1031,7 @@ static void sub_807FAC8(void)
             sBerryBlenderData->mainState++;
         break;
     case 4:
-        if (Blender_PrintText(&sBerryBlenderData->textState, sText_BerryBlenderStart, GetPlayerTextSpeedDelay()))
+        if (Blender_PrintText(&sBerryBlenderData->textState, sText_BerryBlenderStart, GetPlayerTextSpeed()))
             sBerryBlenderData->mainState++;
         break;
     case 5:
@@ -2479,7 +2490,7 @@ static void CB2_HandleBlenderEndGame(void)
         }
         break;
     case 7:
-        if (Blender_PrintText(&sBerryBlenderData->textState, sText_WouldLikeToBlendAnotherBerry, GetPlayerTextSpeedDelay()))
+        if (Blender_PrintText(&sBerryBlenderData->textState, sText_WouldLikeToBlendAnotherBerry, GetPlayerTextSpeed()))
             sBerryBlenderData->gameEndState++;
         break;
     case 9:
@@ -2488,7 +2499,7 @@ static void CB2_HandleBlenderEndGame(void)
         sBerryBlenderData->gameEndState++;
         break;
     case 10:
-        switch (Menu_ProcessInputNoWrapClearOnChoose())
+        switch (Menu_ProcessInputNoWrap_())
         {
         case 1:
         case -1:
@@ -2561,7 +2572,7 @@ static void CB2_HandleBlenderEndGame(void)
         sBerryBlenderData->gameEndState++;
         break;
     case 13:
-        if (Blender_PrintText(&sBerryBlenderData->textState, sText_CommunicationStandby, GetPlayerTextSpeedDelay()))
+        if (Blender_PrintText(&sBerryBlenderData->textState, sText_CommunicationStandby, GetPlayerTextSpeed()))
         {
             SetMainCallback2(CB2_HandlePlayerLinkPlayAgainChoice);
             sBerryBlenderData->gameEndState = 0;
@@ -2669,7 +2680,7 @@ static void CB2_HandlePlayerLinkPlayAgainChoice(void)
         StringAppend(gStringVar4, sText_HasNoBerriesToPut);
         break;
     case 3:
-        if (Blender_PrintText(&sBerryBlenderData->textState, gStringVar4, GetPlayerTextSpeedDelay()))
+        if (Blender_PrintText(&sBerryBlenderData->textState, gStringVar4, GetPlayerTextSpeed()))
         {
             sBerryBlenderData->framesToWait = 0;
             sBerryBlenderData->gameEndState++;
@@ -2776,7 +2787,7 @@ static void CB2_HandlePlayerPlayAgainChoice(void)
         StringCopy(gStringVar4, sText_RunOutOfBerriesForBlending);
         break;
     case 3:
-        if (Blender_PrintText(&sBerryBlenderData->textState, gStringVar4, GetPlayerTextSpeedDelay()))
+        if (Blender_PrintText(&sBerryBlenderData->textState, gStringVar4, GetPlayerTextSpeed()))
             sBerryBlenderData->gameEndState = 9;
         break;
     case 9:
@@ -3352,7 +3363,7 @@ static bool8 Blender_PrintBlendingResults(void)
         sBerryBlenderData->mainState++;
         break;
     case 6:
-        if (Blender_PrintText(&sBerryBlenderData->textState, sBerryBlenderData->stringVar, GetPlayerTextSpeedDelay()))
+        if (Blender_PrintText(&sBerryBlenderData->textState, sBerryBlenderData->stringVar, GetPlayerTextSpeed()))
         {
             TryUpdateBerryBlenderRecord();
             return TRUE;

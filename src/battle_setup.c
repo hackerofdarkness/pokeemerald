@@ -33,7 +33,6 @@
 #include "field_weather.h"
 #include "battle_tower.h"
 #include "gym_leader_rematch.h"
-#include "battle_pike.h"
 #include "constants/map_types.h"
 #include "constants/battle_frontier.h"
 
@@ -55,6 +54,7 @@ struct TrainerBattleParameter
 };
 
 extern bool8 InBattlePyramid(void);
+extern bool8 InBattlePike(void);
 extern bool32 InTrainerHill(void);
 extern bool32 FieldPoisonEffectIsRunning(void);
 extern void RestartWildEncounterImmunitySteps(void);
@@ -79,7 +79,7 @@ extern void CopyTrainerHillTrainerText(u8 a0, u16 arg1);
 // this file's functions
 static void DoBattlePikeWildBattle(void);
 static void DoSafariBattle(void);
-static void DoStandardWildBattle(void);
+static void DoStandardWildBattle(bool32 isDouble);
 static void CB2_EndWildBattle(void);
 static void CB2_EndScriptedWildBattle(void);
 static u8 GetWildBattleTransition(void);
@@ -377,7 +377,12 @@ void BattleSetup_StartWildBattle(void)
     if (GetSafariZoneFlag())
         DoSafariBattle();
     else
-        DoStandardWildBattle();
+        DoStandardWildBattle(FALSE);
+}
+
+void BattleSetup_StartDoubleWildBattle(void)
+{
+    DoStandardWildBattle(TRUE);
 }
 
 void BattleSetup_StartBattlePikeWildBattle(void)
@@ -385,13 +390,15 @@ void BattleSetup_StartBattlePikeWildBattle(void)
     DoBattlePikeWildBattle();
 }
 
-static void DoStandardWildBattle(void)
+static void DoStandardWildBattle(bool32 isDouble)
 {
     ScriptContext2_Enable();
     FreezeEventObjects();
     sub_808BCF4();
     gMain.savedCallback = CB2_EndWildBattle;
     gBattleTypeFlags = 0;
+    if (isDouble)
+        gBattleTypeFlags |= BATTLE_TYPE_DOUBLE;
     if (InBattlePyramid())
     {
         VarSet(VAR_TEMP_E, 0);
@@ -664,7 +671,7 @@ u8 BattleSetup_GetTerrainId(void)
         return BATTLE_TERRAIN_MOUNTAIN;
     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
     {
-        if (MetatileBehavior_GetBridgeType(tileBehavior))
+        if (MetatileBehavior_GetBridgeSth(tileBehavior))
             return BATTLE_TERRAIN_POND;
         if (MetatileBehavior_IsBridge(tileBehavior) == TRUE)
             return BATTLE_TERRAIN_WATER;

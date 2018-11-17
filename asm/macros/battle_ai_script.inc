@@ -315,13 +315,13 @@
 
 	.macro if_effect param0, param1
 	.byte 0x37
-	.byte \param0
+	.2byte \param0
 	.4byte \param1
 	.endm
 
 	.macro if_not_effect param0, param1
 	.byte 0x38
-	.byte \param0
+	.2byte \param0
 	.4byte \param1
 	.endm
 
@@ -467,24 +467,32 @@
 	.byte \battler
 	.endm
 
-	.macro nullsub_52
+	.macro if_move_flag flag jumpptr
 	.byte 0x52
+	.4byte \flag
+	.4byte \jumpptr
 	.endm
 
-	.macro nullsub_53
+	.macro if_field_status flag jumpptr
 	.byte 0x53
+	.4byte \flag
+	.4byte \jumpptr
 	.endm
 
-	.macro nullsub_54
+	.macro get_move_accuracy
 	.byte 0x54
 	.endm
 
-	.macro nullsub_55
+	.macro call_if_eq value, ptr
 	.byte 0x55
+	.2byte \value
+	.4byte \ptr
 	.endm
 
-	.macro nullsub_56
-	.byte 0x56
+	.macro call_if_move_flag flag ptr
+	.byte 0x52
+	.4byte \flag
+	.4byte \ptr
 	.endm
 
 	.macro nullsub_57
@@ -551,7 +559,33 @@
 	.4byte \param2
 	.endm
 	
+	.macro get_ally_chosen_move
+	.byte 0x63
+	.endm
+	
+	.macro if_has_no_attacking_moves battler, param1
+	.byte 0x64
+	.byte \battler
+	.4byte \param1
+	.endm
+	
+	.macro get_hazards_count battler, effect
+	.byte 0x65
+	.byte \battler
+	.2byte \effect
+	.endm
+	
+	.macro if_doesnt_hold_berry battler, ptr
+	.byte 0x66
+	.byte \battler
+	.4byte \ptr
+	.endm
+	
 @ useful script macros
+	.macro if_holds_no_item battler, ptr
+	if_holds_item \battler, 0, \ptr
+	.endm
+
 	.macro get_curr_move_type
 	get_type AI_TYPE_MOVE
 	.endm
@@ -616,4 +650,9 @@
 	
 	.macro if_any_move_encored battler, ptr
 	if_any_move_disabled_or_encored \battler, 1, \ptr
+	.endm
+	
+	.macro call_if_always_hit ptr
+	get_move_accuracy
+	call_if_eq 0, \ptr
 	.endm

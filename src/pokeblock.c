@@ -1,35 +1,35 @@
 #include "global.h"
-#include "battle.h"
-#include "battle_controllers.h"
-#include "battle_message.h"
-#include "berry.h"
-#include "bg.h"
-#include "decompress.h"
-#include "event_data.h"
-#include "gpu_regs.h"
-#include "graphics.h"
-#include "international_string_util.h"
-#include "item.h"
-#include "lilycove_lady.h"
-#include "list_menu.h"
-#include "main.h"
-#include "malloc.h"
-#include "menu.h"
-#include "menu_helpers.h"
-#include "overworld.h"
-#include "palette.h"
 #include "pokeblock.h"
-#include "pokemon.h"
-#include "safari_zone.h"
-#include "scanline_effect.h"
-#include "sound.h"
-#include "string_util.h"
+#include "bg.h"
 #include "strings.h"
-#include "task.h"
 #include "text.h"
 #include "text_window.h"
+#include "menu.h"
+#include "task.h"
+#include "menu_helpers.h"
+#include "pokemon.h"
+#include "graphics.h"
+#include "malloc.h"
+#include "main.h"
+#include "battle.h"
+#include "battle_controllers.h"
+#include "palette.h"
+#include "scanline_effect.h"
+#include "list_menu.h"
+#include "gpu_regs.h"
+#include "decompress.h"
+#include "international_string_util.h"
+#include "item.h"
 #include "constants/items.h"
+#include "string_util.h"
 #include "constants/songs.h"
+#include "sound.h"
+#include "berry.h"
+#include "event_data.h"
+#include "battle_message.h"
+#include "safari_zone.h"
+#include "lilycove_lady.h"
+#include "overworld.h"
 
 #define POKEBLOCK_MAX_FEEL 99
 #define FIELD_E75_COUNT 7
@@ -1139,7 +1139,7 @@ static void Task_HandlePokeblockOptionsInput(u8 taskId)
     if (sub_81221EC() == TRUE)
         return;
 
-    itemId = Menu_ProcessInputNoWrap();
+    itemId = Menu_ProcessInputNoWrapAround();
     if (itemId == MENU_NOTHING_CHOSEN)
     {
         return;
@@ -1179,7 +1179,7 @@ static void PokeblockAction_Toss(u8 taskId)
     sub_8198070(data[1], FALSE);
     StringCopy(gStringVar1, gPokeblockNames[gSaveBlock1Ptr->pokeblocks[gSpecialVar_ItemId].color]);
     StringExpandPlaceholders(gStringVar4, gText_ThrowAwayVar1);
-    DisplayMessageAndContinueTask(taskId, 10, 10, 13, 1, GetPlayerTextSpeedDelay(), gStringVar4, CreateTossPokeblockYesNoMenu);
+    DisplayMessageAndContinueTask(taskId, 10, 10, 13, 1, GetPlayerTextSpeed(), gStringVar4, CreateTossPokeblockYesNoMenu);
 }
 
 static void CreateTossPokeblockYesNoMenu(u8 taskId)
@@ -1190,7 +1190,7 @@ static void CreateTossPokeblockYesNoMenu(u8 taskId)
 static void TossPokeblockChoice_Yes(u8 taskId)
 {
     StringExpandPlaceholders(gStringVar4, gText_Var1ThrownAway);
-    DisplayMessageAndContinueTask(taskId, 10, 10, 13, 1, GetPlayerTextSpeedDelay(), gStringVar4, HandleErasePokeblock);
+    DisplayMessageAndContinueTask(taskId, 10, 10, 13, 1, GetPlayerTextSpeed(), gStringVar4, HandleErasePokeblock);
 }
 
 static void HandleErasePokeblock(u8 taskId)

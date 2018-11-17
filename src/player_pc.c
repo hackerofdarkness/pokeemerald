@@ -352,9 +352,9 @@ static void PlayerPCProcessMenuInput(u8 taskId)
 
     data = gTasks[taskId].data;
     if(gPcItemMenuOptionsNum > 3)
-        inputOptionId = Menu_ProcessInput();
+        inputOptionId = ProcessMenuInput();
     else
-        inputOptionId = Menu_ProcessInputNoWrap();
+        inputOptionId = Menu_ProcessInputNoWrapAround();
 
     switch(inputOptionId)
     {
@@ -463,7 +463,7 @@ static void ItemStorageMenuProcessInput(u8 taskId)
     s8 inputOptionId;
 
     r5 = GetMenuCursorPos();
-    inputOptionId = Menu_ProcessInput();
+    inputOptionId = ProcessMenuInput();
     r2 = GetMenuCursorPos();
     switch(inputOptionId)
     {
@@ -762,13 +762,13 @@ static void Mailbox_MoveToBag(u8 taskId)
 
 static void Mailbox_DrawYesNoBeforeMove(u8 taskId)
 {
-    DisplayYesNoMenu();
+    sub_8197930();
     gTasks[taskId].func = Mailbox_MoveToBagYesNoPrompt;
 }
 
 static void Mailbox_MoveToBagYesNoPrompt(u8 taskId)
 {
-    switch(Menu_ProcessInputNoWrapClearOnChoose())
+    switch(Menu_ProcessInputNoWrap_())
     {
         case 0:
             Mailbox_DoMailMoveToBag(taskId);

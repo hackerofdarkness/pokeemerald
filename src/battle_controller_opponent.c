@@ -1,37 +1,34 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_ai_script_commands.h"
-#include "battle_anim.h"
-#include "battle_arena.h"
 #include "battle_controllers.h"
 #include "battle_message.h"
 #include "battle_interface.h"
-#include "battle_setup.h"
-#include "battle_tower.h"
+#include "battle_anim.h"
+#include "constants/battle_anim.h"
 #include "battle_tv.h"
-#include "bg.h"
-#include "data2.h"
-#include "frontier_util.h"
-#include "item.h"
+#include "battle_ai_script_commands.h"
+#include "pokemon.h"
 #include "link.h"
+#include "util.h"
 #include "main.h"
+#include "item.h"
+#include "constants/items.h"
+#include "constants/songs.h"
+#include "sound.h"
+#include "constants/moves.h"
+#include "constants/trainers.h"
+#include "window.h"
 #include "m4a.h"
 #include "palette.h"
-#include "pokeball.h"
-#include "pokemon.h"
-#include "random.h"
-#include "reshow_battle_screen.h"
-#include "sound.h"
-#include "string_util.h"
 #include "task.h"
 #include "text.h"
-#include "util.h"
-#include "window.h"
-#include "constants/battle_anim.h"
-#include "constants/items.h"
-#include "constants/moves.h"
-#include "constants/songs.h"
-#include "constants/trainers.h"
+#include "string_util.h"
+#include "bg.h"
+#include "reshow_battle_screen.h"
+#include "random.h"
+#include "pokeball.h"
+#include "data2.h"
+#include "battle_setup.h"
 
 extern u16 gBattle_BG0_X;
 extern u16 gBattle_BG0_Y;
@@ -41,7 +38,11 @@ extern struct UnusedControllerStruct gUnknown_02022D0C;
 extern const struct CompressedSpritePalette gTrainerFrontPicPaletteTable[];
 
 extern void sub_8172EF0(u8 battlerId, struct Pokemon *mon);
+extern void sub_81A57E4(u8 battlerId, u16 stringId);
+extern u8 GetFrontierBrainTrainerPicIndex(void);
 extern u8 GetTrainerHillTrainerFrontSpriteId(u16 trainerId);
+extern u8 GetFrontierTrainerFrontSpriteId(u16 trainerId);
+extern u8 GetEreaderTrainerFrontSpriteId(void);
 
 // this file's functions
 static void OpponentHandleGetMonData(void);
@@ -100,6 +101,7 @@ static void OpponentHandleBattleAnimation(void);
 static void OpponentHandleLinkStandbyMsg(void);
 static void OpponentHandleResetActionMoveSelection(void);
 static void OpponentHandleCmd55(void);
+static void OpponentHandleDebugMenu(void);
 static void nullsub_91(void);
 
 static void OpponentBufferRunCommand(void);
@@ -172,6 +174,7 @@ static void (*const sOpponentBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     OpponentHandleLinkStandbyMsg,
     OpponentHandleResetActionMoveSelection,
     OpponentHandleCmd55,
+    OpponentHandleDebugMenu,
     nullsub_91
 };
 
@@ -1512,7 +1515,7 @@ static void OpponentHandlePrintString(void)
     BufferStringBattle(*stringId);
     BattlePutTextOnWindow(gDisplayedStringBattle, 0);
     gBattlerControllerFuncs[gActiveBattler] = CompleteOnInactiveTextPrinter;
-    BattleArena_DeductMindPoints(gActiveBattler, *stringId);
+    sub_81A57E4(gActiveBattler, *stringId);
 }
 
 static void OpponentHandlePrintSelectionString(void)
@@ -1545,7 +1548,6 @@ static void OpponentHandleChooseMove(void)
 
         if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_FIRST_BATTLE | BATTLE_TYPE_SAFARI | BATTLE_TYPE_ROAMER))
         {
-
             BattleAI_SetupAIData(0xF);
             chosenMoveId = BattleAI_ChooseMoveOrAction();
 
@@ -1569,7 +1571,10 @@ static void OpponentHandleChooseMove(void)
                     if (gAbsentBattlerFlags & gBitTable[gBattlerTarget])
                         gBattlerTarget = GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT);
                 }
-                BtlController_EmitTwoReturnValues(1, 10, (chosenMoveId) | (gBattlerTarget << 8));
+                if (CanMegaEvolve(gActiveBattler)) // If opponent can mega evolve, do it.
+                    BtlController_EmitTwoReturnValues(1, 10, (chosenMoveId) | (RET_MEGA_EVOLUTION) | (gBattlerTarget << 8));
+                else
+                    BtlController_EmitTwoReturnValues(1, 10, (chosenMoveId) | (gBattlerTarget << 8));
                 break;
             }
             OpponentBufferExecCompleted();
@@ -2003,6 +2008,11 @@ static void OpponentHandleCmd55(void)
         gMain.callback1 = gPreBattleCallback1;
         SetMainCallback2(gMain.savedCallback);
     }
+    OpponentBufferExecCompleted();
+}
+
+static void OpponentHandleDebugMenu(void)
+{
     OpponentBufferExecCompleted();
 }
 

@@ -1,13 +1,13 @@
 #include "global.h"
-#include "event_data.h"
 #include "field_door.h"
 #include "field_camera.h"
 #include "fieldmap.h"
 #include "metatile_behavior.h"
-#include "task.h"
+#include "event_data.h"
+#include "constants/songs.h"
 #include "constants/flags.h"
 #include "constants/maps.h"
-#include "constants/songs.h"
+#include "task.h"
 
 bool8 sub_808A964(void);
 
@@ -486,6 +486,24 @@ const u8 DoorAnimTiles_50[][0x100] =
 
 asm(".space 32");
 
+const u8 DoorAnimTiles_51[][0x100] =
+{
+	INCBIN_U8("graphics/door_anims/51/0.4bpp"),
+	INCBIN_U8("graphics/door_anims/51/1.4bpp"),
+	INCBIN_U8("graphics/door_anims/51/2.4bpp"),
+};
+
+asm(".space 32");
+
+const u8 DoorAnimTiles_52[][0x100] =
+{
+	INCBIN_U8("graphics/door_anims/52/0.4bpp"),
+	INCBIN_U8("graphics/door_anims/52/1.4bpp"),
+	INCBIN_U8("graphics/door_anims/52/2.4bpp"),
+};
+
+asm(".space 32");
+
 static const struct DoorAnimFrame gDoorOpenAnimFrames[] =
 {
     {4, -1},
@@ -573,6 +591,8 @@ const u8 DoorAnimPalettes_8497154[] = {9, 9, 7, 7, 7, 7, 7, 7}; // door 49
 const u8 DoorAnimPalettes_849715C[] = {9, 9, 9, 9, 9, 9, 9, 9}; // door 50
 const u8 DoorAnimPalettes_8497164[] = {7, 7, 7, 7, 7, 7, 7, 7}; // door 51
 const u8 DoorAnimPalettes_849716C[] = {9, 9, 7, 7, 7, 7, 7, 7}; // door 52
+const u8 DoorAnimPalettes_8497174[] = { 1, 1, 2, 2, 2, 2, 2, 2 }; // door 53
+const u8 DoorAnimPalettes_849717C[] = { 6, 6, 5, 5, 5, 5, 5, 5 }; // door 53
 
 static const struct DoorGraphics gDoorAnimGraphicsTable[] =
 {
@@ -629,6 +649,9 @@ static const struct DoorGraphics gDoorAnimGraphicsTable[] =
     {0x26B, 1, 1, DoorAnimTiles_48, DoorAnimPalettes_849715C}, // door 50
     {0x32C, 1, 1, DoorAnimTiles_49, DoorAnimPalettes_8497164}, // door 51
     {0x383, 1, 1, DoorAnimTiles_50, DoorAnimPalettes_849716C}, // door 52
+	{0x091, 1, 1, DoorAnimTiles_51, DoorAnimPalettes_8497174}, // door 53
+	{0x240, 0, 1, DoorAnimTiles_52, DoorAnimPalettes_849717C}, // door 53
+	{0x0B1, 1, 1, DoorAnimTiles_51, DoorAnimPalettes_8497174}, // door 53
     {0, 0, 0, NULL, NULL},
 };
 

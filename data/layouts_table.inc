@@ -441,3 +441,20 @@ gMapLayouts::
 	.4byte SootopolisCity_MysteryEventsHouse_1F_Layout
 	.4byte SootopolisCity_MysteryEventsHouse_B1F_Layout
 	.4byte UnknownMap_08481DBC_Layout
+	.4byte ZaurakCity_Layout
+	.4byte ZaurakCity_Apartments_1F_Layout
+	.4byte ZaurakCity_Apartments_2F_Layout
+	.4byte ZaurakCity_Apartments_3F_Layout
+	.4byte ZaurakCity_PlayerHouse_Layout
+	.4byte ZaurakCity_PlayerBedroom_Layout
+	.4byte ZaurakCity_Hospital_3F_Layout
+	.4byte ZaurakCity_Hospital_4F_Layout
+	.4byte ZaurakCity_Hospital_5F_Layout
+	.4byte ZaurakCity_HospitalElevator_Layout
+	.4byte NewMap5_Layout
+	.4byte NewMap6_Layout
+	.4byte NewMap7_Layout
+	.4byte NewMap8_Layout
+	.4byte NewMap9_Layout
+	.4byte ZaurakCity_Hospital_2F_Layout
+	.4byte ZaurakCity_Hospital_1F_Layout

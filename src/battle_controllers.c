@@ -1,17 +1,17 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_ai_script_commands.h"
-#include "battle_anim.h"
 #include "battle_controllers.h"
-#include "battle_message.h"
 #include "cable_club.h"
 #include "link.h"
-#include "pokemon.h"
-#include "recorded_battle.h"
 #include "task.h"
+#include "battle_ai_script_commands.h"
+#include "battle_anim.h"
+#include "pokemon.h"
+#include "constants/species.h"
+#include "recorded_battle.h"
 #include "util.h"
 #include "constants/abilities.h"
-#include "constants/species.h"
+#include "battle_message.h"
 
 extern u8 gUnknown_02022D08;
 extern u8 gUnknown_02022D09;
@@ -1063,7 +1063,7 @@ void BtlController_EmitMoveAnimation(u8 bufferId, u16 move, u8 turnOfMove, u16 m
     sBattleBuffersTransferData[9] = (dmg & 0xFF000000) >> 24;
     sBattleBuffersTransferData[10] = friendship;
     sBattleBuffersTransferData[11] = multihit;
-    if (WEATHER_HAS_EFFECT2)
+    if (WEATHER_HAS_EFFECT)
     {
         sBattleBuffersTransferData[12] = gBattleWeather;
         sBattleBuffersTransferData[13] = (gBattleWeather & 0xFF00) >> 8;
@@ -1519,4 +1519,10 @@ void BtlController_EmitCmd55(u8 bufferId, u8 battleOutcome)
     sBattleBuffersTransferData[3] = gSaveBlock2Ptr->frontier.field_CA9_b;
     sBattleBuffersTransferData[5] = sBattleBuffersTransferData[4] = sub_81850DC(&sBattleBuffersTransferData[6]);
     PrepareBufferDataTransfer(bufferId, sBattleBuffersTransferData, sBattleBuffersTransferData[4] + 6);
+}
+
+void BtlController_EmitDebugMenu(u8 bufferId)
+{
+    sBattleBuffersTransferData[0] = CONTROLLER_DEBUGMENU;
+    PrepareBufferDataTransfer(bufferId, sBattleBuffersTransferData, 1);
 }

@@ -1,14 +1,13 @@
-#include "constants/battle_frontier.h"
-#include "constants/field_effects.h"
 #include "constants/flags.h"
 #include "constants/items.h"
-#include "constants/heal_locations.h"
 #include "constants/maps.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/species.h"
-#include "constants/trainers.h"
 #include "constants/vars.h"
+#include "constants/heal_locations.h"
+#include "constants/trainers.h"
+#include "constants/battle_frontier.h"
 	.include "asm/macros.inc"
 	.include "asm/macros/event.inc"
 	.include "constants/constants.inc"
@@ -435,13 +434,13 @@ gStdScripts_End:: @ 81DC2CC
 
 EventScript_SecretBasePC:: @ 823B4BB
 	lockall
-	playse SE_PC_LOGIN
+	playse 2
 	message Text_276805
-	dofieldeffect FLDEFF_PCTURN_ON
+	dofieldeffect 61
 	waitstate
 	waitmessage
 	waitbuttonpress
-	playse SE_SELECT
+	playse 5
 	goto EventScript_23B4D3
 	end
 
@@ -497,12 +496,12 @@ EventScript_23B585:: @ 823B585
 EventScript_RecordMixingSecretBasePC:: @ 823B589
 	lockall
 	message Text_276805
-	playse SE_PC_LOGIN
-	dofieldeffect FLDEFF_PCTURN_ON
+	playse 2
+	dofieldeffect 61
 	waitstate
 	waitmessage
 	waitbuttonpress
-	playse SE_SELECT
+	playse 5
 	goto EventScript_23B5A1
 	end
 
@@ -585,7 +584,7 @@ EventScript_23B680:: @ 823B680
 
 EventScript_SecretBaseSandOrnament:: @ 823B684
 	special sub_80EBE7C
-	dofieldeffect FLDEFF_SAND_PILLAR
+	dofieldeffect 52
 	waitstate
 	end
 
@@ -1436,8 +1435,8 @@ OldaleTown_PokemonCenter_1F_EventScript_27198D:: @ 827198D
 OldaleTown_PokemonCenter_1F_EventScript_271993:: @ 8271993
 	applymovement VAR_0x800B, OldaleTown_PokemonCenter_1F_Movement_2725A4
 	waitmovement 0
-	dofieldeffect FLDEFF_POKECENTER_HEAL
-	waitfieldeffect FLDEFF_POKECENTER_HEAL
+	dofieldeffect 25
+	waitfieldeffect 25
 	applymovement VAR_0x800B, OldaleTown_PokemonCenter_1F_Movement_2725AA
 	waitmovement 0
 	special HealPlayerParty
@@ -1773,7 +1772,7 @@ EventScript_PC:: @ 8271D92
 	end
 
 EventScript_271DAC:: @ 8271DAC
-	message gText_WhichPCShouldBeAccessed
+	message gUnknown_0827266F
 	waitmessage
 	special ScrSpecial_CreatePCMenu
 	waitstate
@@ -1915,7 +1914,7 @@ EventScript_UseSurf:: @ 8271EA0
 	compare VAR_RESULT, 0
 	goto_eq EventScript_271ED5
 	msgbox gUnknown_0827300D, 4
-	dofieldeffect FLDEFF_USE_SURF
+	dofieldeffect 9
 
 EventScript_271ED5:: @ 8271ED5
 	releaseall
@@ -3007,6 +3006,7 @@ SlateportCity_OceanicMuseum_2F_Movement_2725AA: @ 82725AA
 SouthernIsland_Exterior_Movement_2725AA: @ 82725AA
 VerdanturfTown_BattleTentBattleRoom_Movement_2725AA: @ 82725AA
 VictoryRoad_1F_Movement_2725AA: @ 82725AA
+ZaurakCity_HospitalElevator_Movement_2725AA: @ 82725AA
 	walk_in_place_fastest_down
 	step_end
 
@@ -3114,7 +3114,7 @@ Text_272640: @ 8272640
 Text_27265A: @ 827265A
 	.string "{PLAYER} booted up the PC.$"
 
-gText_WhichPCShouldBeAccessed:: @ 827266F
+gUnknown_0827266F:: @ 827266F
 	.string "Which PC should be accessed?$"
 
 gUnknown_0827268C:: @ 827268C
@@ -3130,16 +3130,16 @@ gUnknown_082726D4:: @ 82726D4
 	.string "Accessed LANETTE’s PC.$"
 
 gUnknown_082726EB:: @ 82726EB
-	.string "Hello, and welcome to\nthe POKéMON CENTER.\pWe restore your tired POKéMON\nto full health.\pWould you like to rest your POKéMON?$"
+	.string "Would you like to heal your POKéMON?$"
 
 gUnknown_08272768:: @ 8272768
-	.string "Okay, I’ll take your POKéMON\nfor a few seconds.$"
+	.string "Alright.$"
 
 gUnknown_08272798:: @ 8272798
-	.string "Thank you for waiting.\pWe’ve restored your POKéMON\nto full health.$"
+	.string "Thank you for waiting.$"
 
 gUnknown_082727DB:: @ 82727DB
-	.string "We hope to see you again!$"
+	.string "Have a nice day!$"
 
 gUnknown_082727F5:: @ 82727F5
 	.string "Hello, and welcome to\nthe POKéMON CENTER.\pWe restore your tired POKéMON\nto full health.\pWould you like to…$"
@@ -3202,10 +3202,10 @@ gUnknown_08272B9E:: @ 8272B9E
 	.string "“Rejuvenate your tired partners!”\nPOKéMON CENTER$"
 
 gUnknown_08272BCF:: @ 8272BCF
-	.string "{STR_VAR_1} might like this program.\n… … … … … … … … … … … … … … … …\pBetter get going!$"
+	.string "Let’s watch some TV.\n… … … … … … … … … … … … … … … …\pBetter get going!$"
 
 gUnknown_08272C1D:: @ 8272C1D
-	.string "Welcome to LILYCOVE DEPARTMENT STORE.\pWhich floor would you like?$"
+	.string "Which floor would you like?$"
 
 gUnknown_08272C5F:: @ 8272C5F
 	.string "The sandstorm is vicious.\nIt’s impossible to keep going.$"
@@ -3326,7 +3326,7 @@ EventScript_2736B3:: @ 82736B3
 
 EventScript_Poison:: @ 82736BC
 	lockall
-	special ExecuteWhiteOut
+	special sub_80F972C
 	waitstate
 	compare VAR_RESULT, 1
 	goto_eq EventScript_2736D9
@@ -3357,7 +3357,7 @@ EventScript_2736F8:: @ 82736F8
 	waitmessage
 	waitbuttonpress
 	setvar VAR_0x8004, 16
-	special CallBattlePikeFunction
+	special sub_81A703C
 	compare VAR_RESULT, 1
 	goto_eq BattleFrontier_BattlePikeThreePathRoom_EventScript_2C4222
 	setvar VAR_0x8004, 12
@@ -4448,14 +4448,14 @@ EventScript_275A50:: @ 8275A50
 	goto_eq EventScript_275CDE
 	msgbox Route103_Text_290771, 4
 	closemessage
-	dofieldeffect FLDEFF_USE_SECRET_POWER_CAVE
+	dofieldeffect 11
 	waitstate
 	goto EventScript_275A9B
 	end
 
 EventScript_275A86:: @ 8275A86
 	lockall
-	dofieldeffect FLDEFF_USE_SECRET_POWER_CAVE
+	dofieldeffect 11
 	waitstate
 	goto EventScript_275A9B
 	end
@@ -4480,14 +4480,14 @@ EventScript_275AA9:: @ 8275AA9
 	goto_eq EventScript_275CDE
 	msgbox Route103_Text_290771, 4
 	closemessage
-	dofieldeffect FLDEFF_USE_SECRET_POWER_TREE
+	dofieldeffect 26
 	waitstate
 	goto EventScript_275AF4
 	end
 
 EventScript_275ADF:: @ 8275ADF
 	lockall
-	dofieldeffect FLDEFF_USE_SECRET_POWER_TREE
+	dofieldeffect 26
 	waitstate
 	goto EventScript_275AF4
 	end
@@ -4512,14 +4512,14 @@ EventScript_275B02:: @ 8275B02
 	goto_eq EventScript_275CDE
 	msgbox Route103_Text_290771, 4
 	closemessage
-	dofieldeffect FLDEFF_USE_SECRET_POWER_SHRUB
+	dofieldeffect 27
 	waitstate
 	goto EventScript_275B4D
 	end
 
 EventScript_275B38:: @ 8275B38
 	lockall
-	dofieldeffect FLDEFF_USE_SECRET_POWER_SHRUB
+	dofieldeffect 27
 	waitstate
 	goto EventScript_275B4D
 	end
@@ -8269,13 +8269,13 @@ BattleFrontier_PokeNav_2AF8F7:: @ 82AF8F7
 BattleFrontier_PokeNav_2AFA39:: @ 82AFA39
 	.string "Ahoy there!\n"
 	.string "It’s me, {STR_VAR_1}!\l"
-	.string "I’m out on ROUTE 108 now!\l"
+	.string "I’m out on Route 08 now!\l"
 	.string "In other words, where I always am!\p"
 	.string "Today, a gorgeous SWIMMER \n"
 	.string "swam by me!\p"
 	.string "So I startled her with a shout!\p"
 	.string "And she gave me a nasty glare!\p"
-	.string "That’s all from ROUTE 108!\n"
+	.string "That’s all from Route 08!\n"
 	.string "Brought to you by {STR_VAR_1}!$"
 
 BattleFrontier_PokeNav_2AFB26:: @ 82AFB26
@@ -9274,7 +9274,7 @@ gText_May_Pokenav_2B3CF3:: @ 2B3CF3
 
 gText_May_Pokenav_2B3D4B:: @ 2B3D4B
 	.string "MAY: {PLAYER}{STRING 5}, how are you?\p"
-	.string "I’m out on ROUTE 111 now.\p"
+	.string "I’m out on Route 11 now.\p"
 	.string "I’m going to get a rest at an old\n"
 	.string "lady’s house.\p"
 	.string "She lives just north of\n"
@@ -9290,7 +9290,7 @@ gText_May_Pokenav_2B3DD1:: @ 2B3DD1
 
 gText_May_Pokenav_2B3E69:: @ 2B3E69
 	.string "MAY: {PLAYER}{STRING 5}, yahoo!\n"
-	.string "I’m on ROUTE 119 now.\p"
+	.string "I’m on Route 19 now.\p"
 	.string "There’s a big river here, and\n"
 	.string "it often rains.\p"
 	.string "I got soaked!$"
@@ -9401,7 +9401,7 @@ gText_Brendan_Pokenav_2B463F:: @ 2B463F
 
 gText_Brendan_Pokenav_2B46B7:: @ 2B46B7
 	.string "BRENDAN: {PLAYER}, what’s up?\p"
-	.string "Hey, I’m out on ROUTE 111 now.\p"
+	.string "Hey, I’m out on Route 11 now.\p"
 	.string "I’m going to rest up at an old\n"
 	.string "lady’s house north of the desert.\p"
 	.string "If you’re in the area, you should\n"
@@ -9417,7 +9417,7 @@ gText_Brendan_Pokenav_2B4761:: @ 2B4761
 
 gText_Brendan_Pokenav_2B47F4:: @ 2B47F4
 	.string "BRENDAN: Who’s this? Oh, {PLAYER}?\n"
-	.string "Guess what? I’m on ROUTE 119 now.\p"
+	.string "Guess what? I’m on Route 19 now.\p"
 	.string "There’s a big river here, and\n"
 	.string "it rains all the time.\p"
 	.string "I got soaked to the bone!$"
@@ -9555,7 +9555,7 @@ gText_Scott_Pokenav_2B5184:: @ 2B5184
 	.string "everywhere, too. Busy, busy!$"
 
 gText_Scott_Pokenav_2B5275:: @ 2B5275
-	.string "SCOTT: I’m on ROUTE 119 right now.\n"
+	.string "SCOTT: I’m on Route 19 right now.\n"
 	.string "It’s teeming with TRAINERS!\p"
 	.string "It’s also overgrown with tall grass\n"
 	.string "everywhere, it seems.\p"
@@ -10205,9 +10205,9 @@ BattleFrontier_BattlePikeRandomRoom1_MapScripts_2C3E1B: @ 82C3E1B
 
 BattleFrontier_BattlePikeRandomRoom1_MapScript1_2C3E25: @ 82C3E25
 	setvar VAR_0x8004, 4
-	special CallBattlePikeFunction
+	special sub_81A703C
 	setvar VAR_0x8004, 5
-	special CallBattlePikeFunction
+	special sub_81A703C
 	switch VAR_RESULT
 	case 0, BattleFrontier_BattlePikeRandomRoom1_EventScript_2C3EB1
 	case 1, BattleFrontier_BattlePikeRandomRoom1_EventScript_2C3EB1
@@ -10252,7 +10252,7 @@ BattleFrontier_BattlePikeRandomRoom1_EventScript_2C3EE8:: @ 82C3EE8
 	setvar VAR_OBJ_GFX_ID_1, 28
 	setvar VAR_OBJ_GFX_ID_0, 28
 	setvar VAR_0x8004, 5
-	special CallBattlePikeFunction
+	special sub_81A703C
 	compare VAR_RESULT, 3
 	goto_eq BattleFrontier_BattlePikeRandomRoom1_EventScript_2C3F35
 	compare VAR_RESULT, 6
@@ -10295,24 +10295,24 @@ BattleFrontier_BattlePikeThreePathRoom_EventScript_2C3F64:: @ 82C3F64
 BattleFrontier_BattlePikeThreePathRoom_EventScript_2C3F6F:: @ 82C3F6F
 	setvar VAR_0x8004, 1
 	setvar VAR_0x8005, 1
-	special CallBattlePikeFunction
+	special sub_81A703C
 	addvar VAR_RESULT, 1
 	setvar VAR_0x8004, 2
 	setvar VAR_0x8005, 1
 	copyvar VAR_0x8006, VAR_RESULT
-	special CallBattlePikeFunction
+	special sub_81A703C
 	setvar VAR_0x8004, 1
 	setvar VAR_0x8005, 2
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	addvar VAR_RESULT, 1
 	setvar VAR_0x8004, 2
 	setvar VAR_0x8005, 2
 	copyvar VAR_0x8006, VAR_RESULT
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	setvar VAR_0x8004, 0
-	special CallBattlePikeFunction
+	special sub_81A703C
 	setvar VAR_0x8004, 5
-	special CallBattlePikeFunction
+	special sub_81A703C
 	switch VAR_RESULT
 	case 0, BattleFrontier_BattlePikeThreePathRoom_EventScript_2C4030
 	case 1, BattleFrontier_BattlePikeThreePathRoom_EventScript_2C4030
@@ -10369,29 +10369,29 @@ BattleFrontier_BattlePikeRandomRoom1_EventScript_2C408D:: @ 82C408D
 
 BattleFrontier_BattlePikeRandomRoom1_EventScript_2C40A2:: @ 82C40A2
 	setvar VAR_0x8004, 25
-	special CallBattlePikeFunction
+	special sub_81A703C
 	compare VAR_RESULT, 1
 	call_if 1, BattleFrontier_BattlePikeRandomRoom1_EventScript_2C4128
 	compare VAR_RESULT, 1
 	call_if 5, BattleFrontier_BattlePikeRandomRoom1_EventScript_2C4136
 	setvar VAR_0x8004, 1
 	setvar VAR_0x8005, 1
-	special CallBattlePikeFunction
+	special sub_81A703C
 	addvar VAR_RESULT, 1
 	setvar VAR_0x8004, 2
 	setvar VAR_0x8005, 1
 	copyvar VAR_0x8006, VAR_RESULT
-	special CallBattlePikeFunction
+	special sub_81A703C
 	setvar VAR_0x8004, 1
 	setvar VAR_0x8005, 2
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	addvar VAR_RESULT, 1
 	setvar VAR_0x8004, 2
 	setvar VAR_0x8005, 2
 	copyvar VAR_0x8006, VAR_RESULT
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	setvar VAR_0x8004, 3
-	special CallBattlePikeFunction
+	special sub_81A703C
 	compare VAR_RESULT, 1
 	call_if 1, BattleFrontier_BattlePikeRandomRoom1_EventScript_2C4144
 	compare VAR_RESULT, 0
@@ -10403,14 +10403,14 @@ BattleFrontier_BattlePikeRandomRoom1_EventScript_2C4128:: @ 82C4128
 BattleFrontier_BattlePikeRandomRoom3_EventScript_2C4128:: @ 82C4128
 	setvar VAR_0x8004, 24
 	setvar VAR_0x8005, 1
-	special CallBattlePikeFunction
+	special sub_81A703C
 	return
 
 BattleFrontier_BattlePikeRandomRoom1_EventScript_2C4136:: @ 82C4136
 BattleFrontier_BattlePikeRandomRoom3_EventScript_2C4136:: @ 82C4136
 	setvar VAR_0x8004, 24
 	setvar VAR_0x8005, 0
-	special CallBattlePikeFunction
+	special sub_81A703C
 	return
 
 BattleFrontier_BattlePikeRandomRoom1_EventScript_2C4144:: @ 82C4144
@@ -10431,31 +10431,31 @@ BattleFrontier_BattlePikeRandomRoom3_EventScript_2C415C:: @ 82C415C
 
 BattleFrontier_BattlePikeRandomRoom3_EventScript_2C4174:: @ 82C4174
 	setvar VAR_0x8004, 7
-	special CallBattlePikeFunction
+	special sub_81A703C
 	setvar VAR_0x8004, 25
-	special CallBattlePikeFunction
+	special sub_81A703C
 	compare VAR_RESULT, 1
 	call_if 1, BattleFrontier_BattlePikeRandomRoom3_EventScript_2C4128
 	compare VAR_RESULT, 1
 	call_if 5, BattleFrontier_BattlePikeRandomRoom3_EventScript_2C4136
 	setvar VAR_0x8004, 1
 	setvar VAR_0x8005, 1
-	special CallBattlePikeFunction
+	special sub_81A703C
 	addvar VAR_RESULT, 1
 	setvar VAR_0x8004, 2
 	setvar VAR_0x8005, 1
 	copyvar VAR_0x8006, VAR_RESULT
-	special CallBattlePikeFunction
+	special sub_81A703C
 	setvar VAR_0x8004, 1
 	setvar VAR_0x8005, 2
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	addvar VAR_RESULT, 1
 	setvar VAR_0x8004, 2
 	setvar VAR_0x8005, 2
 	copyvar VAR_0x8006, VAR_RESULT
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	setvar VAR_0x8004, 3
-	special CallBattlePikeFunction
+	special sub_81A703C
 	compare VAR_RESULT, 1
 	call_if 1, BattleFrontier_BattlePikeRandomRoom3_EventScript_2C4144
 	compare VAR_RESULT, 0
@@ -10480,7 +10480,7 @@ BattleFrontier_BattlePikeThreePathRoom_EventScript_2C4222:: @ 82C4222
 	setvar VAR_0x8004, 2
 	setvar VAR_0x8005, 0
 	setvar VAR_0x8006, 4
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	warp MAP_BATTLE_FRONTIER_BATTLE_PIKE_LOBBY, 255, 5, 6
 	waitstate
 	end
@@ -10490,7 +10490,7 @@ BattleFrontier_BattlePikeThreePathRoom_MapScript1_2C423E: @ 82C423E
 	setorcopyvar VAR_0x8006, VAR_RESULT
 	setvar VAR_0x8004, 1
 	setvar VAR_0x8005, 0
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	compare VAR_RESULT, 2
 	goto_eq BattleFrontier_BattlePikeThreePathRoom_EventScript_2C426B
 	compare VAR_RESULT, 1
@@ -10504,7 +10504,7 @@ BattleFrontier_BattlePikeThreePathRoom_EventScript_2C426B:: @ 82C426B
 BattleFrontier_BattlePikeRandomRoom3_EventScript_2C4271:: @ 82C4271
 BattleFrontier_BattlePikeThreePathRoom_EventScript_2C4271:: @ 82C4271
 	setvar VAR_0x8004, 21
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	return
 
 BattleFrontier_BattlePikeRandomRoom1_Movement_2C427A: @ 82C427A
@@ -11666,7 +11666,7 @@ TrainerHill_Roof_MapScript1_2C8336: @ 82C8336
 	special sp194_trainer_tower
 	setvar VAR_0x8004, 1
 	setvar VAR_0x8005, 5
-	special CallFrontierUtilFunc
+	special sub_81A1780
 	compare VAR_RESULT, 2
 	goto_eq TrainerHill_1F_EventScript_2C83C9
 	compare VAR_RESULT, 3
@@ -11855,3 +11855,54 @@ gText_082C877B:: @ 82C877B
 	.align 2
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"
+
+	.include "data/maps/ZaurakCity/scripts.inc"
+	.include "data/maps/ZaurakCity/text.inc"
+
+	.include "data/maps/ZaurakCity_Apartments_1F/scripts.inc"
+	.include "data/maps/ZaurakCity_Apartments_1F/text.inc"
+
+	.include "data/maps/ZaurakCity_Apartments_2F/scripts.inc"
+	.include "data/maps/ZaurakCity_Apartments_2F/text.inc"
+
+	.include "data/maps/ZaurakCity_Apartments_3F/scripts.inc"
+	.include "data/maps/ZaurakCity_Apartments_3F/text.inc"
+
+	.include "data/maps/ZaurakCity_PlayerHouse/scripts.inc"
+	.include "data/maps/ZaurakCity_PlayerHouse/text.inc"
+
+	.include "data/maps/ZaurakCity_PlayerBedroom/scripts.inc"
+	.include "data/maps/ZaurakCity_PlayerBedroom/text.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_3F/scripts.inc"
+	.include "data/maps/ZaurakCity_Hospital_3F/text.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_4F/scripts.inc"
+	.include "data/maps/ZaurakCity_Hospital_4F/text.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_5F/scripts.inc"
+	.include "data/maps/ZaurakCity_Hospital_5F/text.inc"
+
+	.include "data/maps/ZaurakCity_HospitalElevator/scripts.inc"
+	.include "data/maps/ZaurakCity_HospitalElevator/text.inc"
+
+	.include "data/maps/NewMap5/scripts.inc"
+	.include "data/maps/NewMap5/text.inc"
+
+	.include "data/maps/NewMap6/scripts.inc"
+	.include "data/maps/NewMap6/text.inc"
+
+	.include "data/maps/NewMap7/scripts.inc"
+	.include "data/maps/NewMap7/text.inc"
+
+	.include "data/maps/NewMap8/scripts.inc"
+	.include "data/maps/NewMap8/text.inc"
+
+	.include "data/maps/NewMap9/scripts.inc"
+	.include "data/maps/NewMap9/text.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_2F/scripts.inc"
+	.include "data/maps/ZaurakCity_Hospital_2F/text.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_1F/scripts.inc"
+	.include "data/maps/ZaurakCity_Hospital_1F/text.inc"

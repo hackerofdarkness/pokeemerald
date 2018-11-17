@@ -1,35 +1,35 @@
 #include "global.h"
-#include "battle.h"
-#include "battle_controllers.h"
 #include "battle_pyramid_bag.h"
+#include "main.h"
+#include "battle_controllers.h"
 #include "bg.h"
-#include "decompress.h"
-#include "event_data.h"
 #include "field_effect.h"
 #include "field_weather.h"
-#include "graphics.h"
 #include "gpu_regs.h"
-#include "international_string_util.h"
-#include "item.h"
-#include "item_icon.h"
-#include "item_menu.h"
-#include "item_use.h"
-#include "list_menu.h"
-#include "mail.h"
-#include "main.h"
 #include "malloc.h"
 #include "menu.h"
+#include "overworld.h"
 #include "menu_helpers.h"
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
-#include "task.h"
-#include "text_window.h"
 #include "scanline_effect.h"
 #include "script.h"
-#include "sound.h"
+#include "task.h"
+#include "decompress.h"
+#include "graphics.h"
 #include "string_util.h"
+#include "list_menu.h"
 #include "strings.h"
+#include "item.h"
+#include "sound.h"
+#include "item_menu.h"
+#include "mail.h"
+#include "item_use.h"
+#include "event_data.h"
+#include "text_window.h"
+#include "international_string_util.h"
+#include "item_icon.h"
 #include "constants/items.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
@@ -942,7 +942,7 @@ static void HandleFewMenuActionsInput(u8 taskId)
 {
     if (sub_81221EC() != TRUE)
     {
-        s32 id = Menu_ProcessInputNoWrap();
+        s32 id = Menu_ProcessInputNoWrapAround();
         switch (id)
         {
         case -2:
@@ -1457,7 +1457,7 @@ static void sub_81C6DAC(u8 taskId, const struct YesNoFuncTable *yesNoTable)
 void DisplayItemMessageInBattlePyramid(u8 taskId, const u8 *str, void (*callback)(u8 taskId))
 {
     FillWindowPixelBuffer(2, 0x11);
-    DisplayMessageAndContinueTask(taskId, 2, 0xA, 0xD, 1, GetPlayerTextSpeedDelay(), str, callback);
+    DisplayMessageAndContinueTask(taskId, 2, 0xA, 0xD, 1, GetPlayerTextSpeed(), str, callback);
     schedule_bg_copy_tilemap_to_vram(1);
 }
 

@@ -447,6 +447,13 @@
 
 #define NUM_SPECIES SPECIES_EGG
 
+#define SPECIES_DIALGA 0
+#define SPECIES_PALKIA 0
+#define SPECIES_GIRATINA 0
+#define SPECIES_CHERRIM 0
+#define SPECIES_ARCEUS 0
+#define SPECIES_SILVALLY 0
+
 // National Dex Index Defines
 
 #define NATIONAL_DEX_BULBASAUR 1

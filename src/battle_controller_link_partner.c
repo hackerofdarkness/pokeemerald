@@ -1,30 +1,30 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_ai_script_commands.h"
-#include "battle_anim.h"
 #include "battle_controllers.h"
-#include "battle_interface.h"
 #include "battle_message.h"
-#include "battle_setup.h"
-#include "battle_tv.h"
-#include "bg.h"
-#include "data2.h"
-#include "link.h"
-#include "main.h"
-#include "m4a.h"
-#include "palette.h"
-#include "pokeball.h"
-#include "pokemon.h"
-#include "reshow_battle_screen.h"
-#include "sound.h"
-#include "string_util.h"
-#include "task.h"
-#include "text.h"
-#include "util.h"
-#include "window.h"
+#include "battle_interface.h"
+#include "battle_anim.h"
 #include "constants/battle_anim.h"
+#include "battle_ai_script_commands.h"
+#include "battle_tv.h"
+#include "pokemon.h"
+#include "link.h"
+#include "util.h"
+#include "main.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
+#include "sound.h"
+#include "window.h"
+#include "m4a.h"
+#include "palette.h"
+#include "task.h"
+#include "text.h"
+#include "string_util.h"
+#include "bg.h"
+#include "reshow_battle_screen.h"
+#include "pokeball.h"
+#include "data2.h"
+#include "battle_setup.h"
 
 extern u16 gBattle_BG0_X;
 extern u16 gBattle_BG0_Y;
@@ -94,6 +94,7 @@ static void LinkPartnerHandleBattleAnimation(void);
 static void LinkPartnerHandleLinkStandbyMsg(void);
 static void LinkPartnerHandleResetActionMoveSelection(void);
 static void LinkPartnerHandleCmd55(void);
+static void LinkPartnerHandleBattleDebug(void);
 static void nullsub_113(void);
 
 static void LinkPartnerBufferRunCommand(void);
@@ -165,6 +166,7 @@ static void (*const sLinkPartnerBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     LinkPartnerHandleLinkStandbyMsg,
     LinkPartnerHandleResetActionMoveSelection,
     LinkPartnerHandleCmd55,
+    LinkPartnerHandleBattleDebug,
     nullsub_113
 };
 
@@ -1689,6 +1691,11 @@ static void LinkPartnerHandleCmd55(void)
     BeginFastPaletteFade(3);
     LinkPartnerBufferExecCompleted();
     gBattlerControllerFuncs[gActiveBattler] = sub_80587B0;
+}
+
+static void LinkPartnerHandleBattleDebug(void)
+{
+    LinkPartnerBufferExecCompleted();
 }
 
 static void nullsub_113(void)

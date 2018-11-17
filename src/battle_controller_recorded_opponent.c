@@ -1,32 +1,32 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_ai_script_commands.h"
-#include "battle_anim.h"
 #include "battle_controllers.h"
-#include "battle_interface.h"
 #include "battle_message.h"
-#include "battle_setup.h"
-#include "battle_tv.h"
-#include "bg.h"
-#include "data2.h"
-#include "item_use.h"
-#include "link.h"
-#include "main.h"
-#include "m4a.h"
-#include "palette.h"
-#include "pokeball.h"
-#include "pokemon.h"
-#include "recorded_battle.h"
-#include "reshow_battle_screen.h"
-#include "sound.h"
-#include "string_util.h"
-#include "task.h"
-#include "text.h"
-#include "util.h"
-#include "window.h"
+#include "battle_interface.h"
+#include "battle_anim.h"
 #include "constants/battle_anim.h"
+#include "battle_ai_script_commands.h"
+#include "battle_tv.h"
+#include "recorded_battle.h"
+#include "pokemon.h"
+#include "link.h"
+#include "util.h"
+#include "main.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
+#include "sound.h"
+#include "window.h"
+#include "m4a.h"
+#include "palette.h"
+#include "task.h"
+#include "text.h"
+#include "string_util.h"
+#include "bg.h"
+#include "reshow_battle_screen.h"
+#include "pokeball.h"
+#include "data2.h"
+#include "item_use.h"
+#include "battle_setup.h"
 
 extern u16 gBattle_BG0_X;
 extern u16 gBattle_BG0_Y;
@@ -97,6 +97,7 @@ static void RecordedOpponentHandleBattleAnimation(void);
 static void RecordedOpponentHandleLinkStandbyMsg(void);
 static void RecordedOpponentHandleResetActionMoveSelection(void);
 static void RecordedOpponentHandleCmd55(void);
+static void RecordedOpponentHandleBattleDebug(void);
 static void nullsub_119(void);
 
 static void RecordedOpponentBufferRunCommand(void);
@@ -169,6 +170,7 @@ static void (*const sRecordedOpponentBufferCommands[CONTROLLER_CMDS_COUNT])(void
     RecordedOpponentHandleLinkStandbyMsg,
     RecordedOpponentHandleResetActionMoveSelection,
     RecordedOpponentHandleCmd55,
+    RecordedOpponentHandleBattleDebug,
     nullsub_119
 };
 
@@ -1795,6 +1797,11 @@ static void RecordedOpponentHandleCmd55(void)
     BeginFastPaletteFade(3);
     RecordedOpponentBufferExecCompleted();
     gBattlerControllerFuncs[gActiveBattler] = sub_80587B0;
+}
+
+static void RecordedOpponentHandleBattleDebug(void)
+{
+    RecordedOpponentBufferExecCompleted();
 }
 
 static void nullsub_119(void)

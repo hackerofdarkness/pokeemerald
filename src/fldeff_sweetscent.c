@@ -1,4 +1,6 @@
 #include "global.h"
+#include "constants/rgb.h"
+#include "constants/songs.h"
 #include "event_data.h"
 #include "event_scripts.h"
 #include "field_effect.h"
@@ -12,25 +14,22 @@
 #include "sprite.h"
 #include "task.h"
 #include "wild_encounter.h"
-#include "constants/field_effects.h"
-#include "constants/rgb.h"
-#include "constants/songs.h"
 
-static void FieldCallback_SweetScent(void);
-static void StartSweetScentFieldEffect(void);
-static void TrySweetScentEncounter(u8 taskId);
-static void FailSweetScentEncounter(u8 taskId);
+void hm2_sweet_scent(void);
+void sub_8159F5C(void);
+void sub_8159FEC(u8 taskId);
+void sub_815A090(u8 taskId);
 void sub_81BE6B8(void);
 void sub_81BE72C(void);
 
 bool8 SetUpFieldMove_SweetScent(void)
 {
     gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
-    gPostMenuFieldCallback = FieldCallback_SweetScent;
+    gPostMenuFieldCallback = hm2_sweet_scent;
     return TRUE;
 }
 
-static void FieldCallback_SweetScent(void)
+void hm2_sweet_scent(void)
 {
     FieldEffectStart(FLDEFF_SWEET_SCENT);
     gFieldEffectArguments[0] = GetCursorSelectionMonId();
@@ -42,12 +41,12 @@ bool8 FldEff_SweetScent(void)
 
     sub_80AC3D0();
     taskId = oei_task_add();
-    gTasks[taskId].data[8] = (u32)StartSweetScentFieldEffect >> 16;
-    gTasks[taskId].data[9] = (u32)StartSweetScentFieldEffect;
+    gTasks[taskId].data[8] = (u32)sub_8159F5C >> 16;
+    gTasks[taskId].data[9] = (u32)sub_8159F5C;
     return FALSE;
 }
 
-static void StartSweetScentFieldEffect(void)
+void sub_8159F5C(void)
 {
     u8 taskId;
 
@@ -55,12 +54,12 @@ static void StartSweetScentFieldEffect(void)
     CpuFastSet(gPlttBufferUnfaded, gPaletteDecompressionBuffer, 0x100);
     CpuFastSet(gPlttBufferFaded, gPlttBufferUnfaded, 0x100);
     BeginNormalPaletteFade(~(1 << (gSprites[GetPlayerAvatarObjectId()].oam.paletteNum + 16)), 4, 0, 8, RGB_RED);
-    taskId = CreateTask(TrySweetScentEncounter, 0);
+    taskId = CreateTask(sub_8159FEC, 0);
     gTasks[taskId].data[0] = 0;
     FieldEffectActiveListRemove(FLDEFF_SWEET_SCENT);
 }
 
-static void TrySweetScentEncounter(u8 taskId)
+void sub_8159FEC(u8 taskId)
 {
     if (!gPaletteFade.active)
     {
@@ -75,7 +74,7 @@ static void TrySweetScentEncounter(u8 taskId)
             }
             else
             {
-                gTasks[taskId].func = FailSweetScentEncounter;
+                gTasks[taskId].func = sub_815A090;
                 BeginNormalPaletteFade(~(1 << (gSprites[GetPlayerAvatarObjectId()].oam.paletteNum + 16)), 4, 8, 0, RGB_RED);
                 sub_81BE6B8();
             }
@@ -87,7 +86,7 @@ static void TrySweetScentEncounter(u8 taskId)
     }
 }
 
-static void FailSweetScentEncounter(u8 taskId)
+void sub_815A090(u8 taskId)
 {
     if (!gPaletteFade.active)
     {

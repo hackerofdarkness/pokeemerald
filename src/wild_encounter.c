@@ -18,7 +18,7 @@
 #include "tv.h"
 #include "link.h"
 #include "script.h"
-#include "battle_pike.h"
+#include "battle_debug.h"
 #include "constants/items.h"
 #include "constants/maps.h"
 
@@ -26,7 +26,10 @@ extern const u8 EventScript_RepelWoreOff[];
 
 #define NUM_FEEBAS_SPOTS    6
 
+extern u8 GetBattlePikeWildMonHeaderId(void);
+extern bool32 TryGenerateBattlePikeWildMon(bool8 checkKeenEyeIntimidate);
 extern void GenerateBattlePyramidWildMon(void);
+extern bool8 InBattlePike(void);
 extern bool8 InBattlePyramid(void);
 
 // this file's functions
@@ -5144,7 +5147,17 @@ bool8 StandardWildEncounter(u16 currMetaTileBehavior, u16 previousMetaTileBehavi
                 // try a regular wild land encounter
                 if (TryGenerateWildMon(gWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
                 {
-                    BattleSetup_StartWildBattle();
+                    if (USE_BATTLE_DEBUG && GetMonsStateToDoubles() == PLAYER_HAS_TWO_USABLE_MONS)
+                    {
+                        struct Pokemon mon1 = gEnemyParty[0];
+                        TryGenerateWildMon(gWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, WILD_CHECK_KEEN_EYE);
+                        gEnemyParty[1] = mon1;
+                        BattleSetup_StartDoubleWildBattle();
+                    }
+                    else
+                    {
+                        BattleSetup_StartWildBattle();
+                    }
                     return TRUE;
                 }
 

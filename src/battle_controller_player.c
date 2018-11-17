@@ -1,38 +1,37 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_anim.h"
-#include "battle_arena.h"
 #include "battle_controllers.h"
-#include "battle_dome.h"
-#include "battle_interface.h"
 #include "battle_message.h"
-#include "battle_setup.h"
+#include "battle_interface.h"
+#include "battle_anim.h"
+#include "constants/battle_anim.h"
 #include "battle_tv.h"
-#include "bg.h"
-#include "data2.h"
-#include "item.h"
-#include "item_menu.h"
+#include "pokemon.h"
 #include "link.h"
+#include "util.h"
 #include "main.h"
+#include "item.h"
+#include "constants/items.h"
+#include "constants/songs.h"
+#include "sound.h"
+#include "constants/moves.h"
+#include "constants/trainers.h"
+#include "window.h"
 #include "m4a.h"
 #include "palette.h"
-#include "party_menu.h"
-#include "pokeball.h"
-#include "pokemon.h"
-#include "random.h"
-#include "recorded_battle.h"
-#include "reshow_battle_screen.h"
-#include "sound.h"
-#include "string_util.h"
 #include "task.h"
 #include "text.h"
-#include "util.h"
-#include "window.h"
-#include "constants/battle_anim.h"
-#include "constants/items.h"
-#include "constants/moves.h"
-#include "constants/songs.h"
-#include "constants/trainers.h"
+#include "string_util.h"
+#include "bg.h"
+#include "reshow_battle_screen.h"
+#include "random.h"
+#include "pokeball.h"
+#include "data2.h"
+#include "battle_setup.h"
+#include "item_menu.h"
+#include "recorded_battle.h"
+#include "party_menu.h"
+#include "battle_dome.h"
 
 extern u8 gUnknown_0203CEE8;
 extern u8 gUnknown_0203CEE9;
@@ -47,6 +46,7 @@ extern const struct CompressedSpritePalette gTrainerBackPicPaletteTable[];
 
 extern void sub_8172EF0(u8 battlerId, struct Pokemon *mon);
 extern void sub_81AABB0(void);
+extern void sub_81A57E4(u8 battlerId, u16 stringId);
 extern void sub_81851A8(u8 *);
 
 // this file's functions
@@ -105,6 +105,7 @@ static void PlayerHandleBattleAnimation(void);
 static void PlayerHandleLinkStandbyMsg(void);
 static void PlayerHandleResetActionMoveSelection(void);
 static void PlayerHandleCmd55(void);
+static void PlayerHandleBattleDebug(void);
 static void nullsub_22(void);
 
 static void PlayerBufferRunCommand(void);
@@ -192,6 +193,7 @@ static void (*const sPlayerBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     PlayerHandleLinkStandbyMsg,
     PlayerHandleResetActionMoveSelection,
     PlayerHandleCmd55,
+    PlayerHandleBattleDebug,
     nullsub_22
 };
 
@@ -341,6 +343,11 @@ static void HandleInputChooseAction(void)
     {
         SwapHpBarsWithHpText();
     }
+    else if (USE_BATTLE_DEBUG && gMain.newKeys & SELECT_BUTTON)
+    {
+        BtlController_EmitTwoReturnValues(1, B_ACTION_DEBUG, 0);
+        PlayerBufferExecCompleted();
+    }
 }
 
 static void sub_80577F0(void) // unused
@@ -379,8 +386,12 @@ static void HandleInputChooseTarget(void)
     {
         PlaySE(SE_SELECT);
         gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = sub_8039B2C;
-        BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
+        if (gBattleStruct->mega.playerSelect)
+            BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | RET_MEGA_EVOLUTION | (gMultiUsePlayerCursor << 8));
+        else
+            BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
         EndBounceEffect(gMultiUsePlayerCursor, BOUNCE_HEALTHBOX);
+        HideMegaTriggerSprite();
         PlayerBufferExecCompleted();
     }
     else if (gMain.newKeys & B_BUTTON || gPlayerDpadHoldFrames > 59)
@@ -533,7 +544,11 @@ static void HandleInputChooseMove(void)
 
         if (!canSelectTarget)
         {
-            BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
+            if (gBattleStruct->mega.playerSelect)
+                BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | RET_MEGA_EVOLUTION | (gMultiUsePlayerCursor << 8));
+            else
+                BtlController_EmitTwoReturnValues(1, 10, gMoveSelectionCursor[gActiveBattler] | (gMultiUsePlayerCursor << 8));
+            HideMegaTriggerSprite();
             PlayerBufferExecCompleted();
         }
         else
@@ -553,7 +568,9 @@ static void HandleInputChooseMove(void)
     else if (gMain.newKeys & B_BUTTON || gPlayerDpadHoldFrames > 59)
     {
         PlaySE(SE_SELECT);
+        gBattleStruct->mega.playerSelect = FALSE;
         BtlController_EmitTwoReturnValues(1, 10, 0xFFFF);
+        HideMegaTriggerSprite();
         PlayerBufferExecCompleted();
     }
     else if (gMain.newKeys & DPAD_LEFT)
@@ -620,6 +637,15 @@ static void HandleInputChooseMove(void)
             MoveSelectionCreateCursorAt(gMultiUsePlayerCursor, 27);
             BattlePutTextOnWindow(gText_BattleSwitchWhich, 0xB);
             gBattlerControllerFuncs[gActiveBattler] = HandleMoveSwitchting;
+        }
+    }
+    else if (gMain.newKeys & START_BUTTON)
+    {
+        if (CanMegaEvolve(gActiveBattler))
+        {
+            gBattleStruct->mega.playerSelect ^= 1;
+            ChangeMegaTriggerSprite(gBattleStruct->mega.triggerSpriteId, gBattleStruct->mega.playerSelect);
+            PlaySE(SE_SELECT);
         }
     }
 }
@@ -2426,7 +2452,7 @@ static void PlayerHandleSuccessBallThrowAnim(void)
 {
     gBattleSpritesDataPtr->animationData->ballThrowCaseId = BALL_3_SHAKES_SUCCESS;
     gDoingBattleAnim = TRUE;
-    InitAndLaunchSpecialAnimation(gActiveBattler, gActiveBattler, GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT), B_ANIM_BALL_THROW);
+    InitAndLaunchSpecialAnimation(gActiveBattler, gActiveBattler, gBattlerTarget, B_ANIM_BALL_THROW);
     gBattlerControllerFuncs[gActiveBattler] = CompleteOnSpecialAnimDone;
 }
 
@@ -2436,7 +2462,7 @@ static void PlayerHandleBallThrowAnim(void)
 
     gBattleSpritesDataPtr->animationData->ballThrowCaseId = ballThrowCaseId;
     gDoingBattleAnim = TRUE;
-    InitAndLaunchSpecialAnimation(gActiveBattler, gActiveBattler, GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT), B_ANIM_BALL_THROW);
+    InitAndLaunchSpecialAnimation(gActiveBattler, gActiveBattler, gBattlerTarget, B_ANIM_BALL_THROW);
     gBattlerControllerFuncs[gActiveBattler] = CompleteOnSpecialAnimDone;
 }
 
@@ -2537,7 +2563,7 @@ static void PlayerHandlePrintString(void)
     BattlePutTextOnWindow(gDisplayedStringBattle, 0);
     gBattlerControllerFuncs[gActiveBattler] = CompleteOnInactiveTextPrinter2;
     BattleTv_SetDataBasedOnString(*stringId);
-    BattleArena_DeductMindPoints(gActiveBattler, *stringId);
+    sub_81A57E4(gActiveBattler, *stringId);
 }
 
 static void PlayerHandlePrintSelectionString(void)
@@ -2600,11 +2626,9 @@ static void HandleChooseMoveAfterDma3(void)
     }
 }
 
-// arenaMindPoints is used here as a placeholder for a timer.
-
 static void PlayerChooseMoveInBattlePalace(void)
 {
-    if (--*(gBattleStruct->arenaMindPoints + gActiveBattler) == 0)
+    if (--*(gBattleStruct->field_298 + gActiveBattler) == 0)
     {
         gBattlePalaceMoveSelectionRngValue = gRngValue;
         BtlController_EmitTwoReturnValues(1, 10, ChooseMoveAndTargetInBattlePalace());
@@ -2616,12 +2640,17 @@ static void PlayerHandleChooseMove(void)
 {
     if (gBattleTypeFlags & BATTLE_TYPE_PALACE)
     {
-        *(gBattleStruct->arenaMindPoints + gActiveBattler) = 8;
+        *(gBattleStruct->field_298 + gActiveBattler) = 8;
         gBattlerControllerFuncs[gActiveBattler] = PlayerChooseMoveInBattlePalace;
     }
     else
     {
         InitMoveSelectionsVarsAndStrings();
+        gBattleStruct->mega.playerSelect = FALSE;
+        if (!IsMegaTriggerSpriteActive())
+            gBattleStruct->mega.triggerSpriteId = 0xFF;
+        if (CanMegaEvolve(gActiveBattler))
+            CreateMegaTriggerSprite(gActiveBattler, 0);
         gBattlerControllerFuncs[gActiveBattler] = HandleChooseMoveAfterDma3;
     }
 }
@@ -3109,6 +3138,21 @@ static void PlayerHandleCmd55(void)
     BeginFastPaletteFade(3);
     PlayerBufferExecCompleted();
     gBattlerControllerFuncs[gActiveBattler] = sub_80587B0;
+}
+
+static void WaitForDebug(void)
+{
+    if (gMain.callback2 == BattleMainCB2 && !gPaletteFade.active)
+    {
+        PlayerBufferExecCompleted();
+    }
+}
+
+static void PlayerHandleBattleDebug(void)
+{
+    BeginNormalPaletteFade(-1, 0, 0, 0x10, 0);
+    SetMainCallback2(CB2_BattleDebugMenu);
+    gBattlerControllerFuncs[gActiveBattler] = WaitForDebug;
 }
 
 static void nullsub_22(void)

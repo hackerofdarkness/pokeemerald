@@ -22,7 +22,6 @@
 #define ABILITYEFFECT_TRACE                      0xB
 #define ABILITYEFFECT_CHECK_OTHER_SIDE           0xC
 #define ABILITYEFFECT_CHECK_BATTLER_SIDE         0xD
-#define ABILITYEFFECT_FIELD_SPORT                0xE
 #define ABILITYEFFECT_CHECK_FIELD_EXCEPT_BATTLER 0xF
 #define ABILITYEFFECT_COUNT_OTHER_SIDE           0x10
 #define ABILITYEFFECT_COUNT_BATTLER_SIDE         0x11
@@ -32,14 +31,12 @@
 
 #define ABILITY_ON_OPPOSING_FIELD(battlerId, abilityId)(AbilityBattleEffects(ABILITYEFFECT_CHECK_OTHER_SIDE, battlerId, abilityId, 0, 0))
 #define ABILITY_ON_FIELD(abilityId)(AbilityBattleEffects(ABILITYEFFECT_CHECK_ON_FIELD, 0, abilityId, 0, 0))
-#define ABILITY_ON_FIELD2(abilityId)(AbilityBattleEffects(ABILITYEFFECT_FIELD_SPORT, 0, abilityId, 0, 0))
 
 #define ITEMEFFECT_ON_SWITCH_IN                 0x0
 #define ITEMEFFECT_MOVE_END                     0x3
 #define ITEMEFFECT_KINGSROCK_SHELLBELL          0x4
 
 #define WEATHER_HAS_EFFECT ((!ABILITY_ON_FIELD(ABILITY_CLOUD_NINE) && !ABILITY_ON_FIELD(ABILITY_AIR_LOCK)))
-#define WEATHER_HAS_EFFECT2 ((!ABILITY_ON_FIELD2(ABILITY_CLOUD_NINE) && !ABILITY_ON_FIELD2(ABILITY_AIR_LOCK)))
 
 u8 GetBattlerForBattleScript(u8 caseId);
 void PressurePPLose(u8 bankDef, u8 bankAtk, u16 move);
@@ -65,10 +62,11 @@ u8 DoFieldEndTurnEffects(void);
 u8 DoBattlerEndTurnEffects(void);
 bool8 HandleWishPerishSongOnTurnEnd(void);
 bool8 HandleFaintedMonActions(void);
-void TryClearRageStatuses(void);
+void TryClearRageAndFuryCutter(void);
 u8 AtkCanceller_UnableToUseMove(void);
 bool8 HasNoMonsToSwitch(u8 battlerId, u8 r1, u8 r2);
 u8 CastformDataTypeChange(u8 battlerId);
+bool32 TryChangeBattleWeather(u8 battler, u32 weatherEnumId, bool32 viaAbility);
 u8 AbilityBattleEffects(u8 caseID, u8 battlerId, u8 ability, u8 special, u16 moveArg);
 void BattleScriptExecute(const u8* BS_ptr);
 void BattleScriptPushCursorAndCallback(const u8* BS_ptr);
@@ -77,5 +75,23 @@ void ClearFuryCutterDestinyBondGrudge(u8 battlerId);
 void HandleAction_RunBattleScript(void);
 u8 GetMoveTarget(u16 move, u8 setTarget);
 u8 IsMonDisobedient(void);
+u32 GetBattlerAbility(u8 battlerId);
+u32 GetBattlerHoldEffect(u8 battlerId, bool32 checkNegating);
+u32 GetBattlerHoldEffectParam(u8 battlerId);
+bool32 IsMoveMakingContact(u16 move, u8 battlerAtk);
+bool32 IsBattlerGrounded(u8 battlerId);
+bool32 IsBattlerAlive(u8 battlerId);
+u8 GetBattleMonMoveSlot(struct BattlePokemon *battleMon, u16 move);
+u32 GetBattlerWeight(u8 battlerId);
+s32 CalculateMoveDamage(u16 move, u8 battlerAtk, u8 battlerDef, u8 moveType, s32 fixedBasePower, bool32 isCrit, bool32 randomFactor);
+u16 CalcTypeEffectivenessMultiplier(u16 move, u8 moveType, u8 battlerAtk, u8 battlerDef, bool32 recordAbilities);
+u16 CalcPartyMonTypeEffectivenessMultiplier(u16 move, u16 speciesDef, u8 abilityDef);
+u16 GetTypeModifier(u8 atkType, u8 defType);
+s32 GetStealthHazardDamage(u8 hazardType, u8 battlerId);
+u16 GetMegaEvolutionSpecies(u16 preEvoSpecies, u16 heldItemId);
+bool32 CanMegaEvolve(u8 battlerId);
+void UndoMegaEvolution(u8 monId);
+bool32 DoBattlersShareType(u32 battler1, u32 battler2);
+bool32 CanBattlerGetOrLoseItem(u8 battlerId, u16 itemId);
 
 #endif // GUARD_BATTLE_UTIL_H

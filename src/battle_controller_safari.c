@@ -1,27 +1,27 @@
 #include "global.h"
 #include "battle.h"
-#include "battle_anim.h"
 #include "battle_controllers.h"
-#include "battle_interface.h"
 #include "battle_message.h"
-#include "bg.h"
-#include "data2.h"
-#include "item_menu.h"
+#include "battle_interface.h"
+#include "battle_anim.h"
+#include "constants/battle_anim.h"
+#include "pokemon.h"
 #include "link.h"
+#include "util.h"
 #include "main.h"
+#include "constants/songs.h"
+#include "sound.h"
+#include "window.h"
 #include "m4a.h"
 #include "palette.h"
-#include "pokeball.h"
-#include "pokeblock.h"
-#include "pokemon.h"
-#include "reshow_battle_screen.h"
-#include "sound.h"
 #include "task.h"
 #include "text.h"
-#include "util.h"
-#include "window.h"
-#include "constants/battle_anim.h"
-#include "constants/songs.h"
+#include "bg.h"
+#include "reshow_battle_screen.h"
+#include "pokeball.h"
+#include "data2.h"
+#include "pokeblock.h"
+#include "item_menu.h"
 
 extern u16 gBattle_BG0_X;
 extern u16 gBattle_BG0_Y;
@@ -87,6 +87,7 @@ static void SafariHandleBattleAnimation(void);
 static void SafariHandleLinkStandbyMsg(void);
 static void SafariHandleResetActionMoveSelection(void);
 static void SafariHandleCmd55(void);
+static void SafariHandleBattleDebug(void);
 static void nullsub_115(void);
 
 static void SafariBufferRunCommand(void);
@@ -151,6 +152,7 @@ static void (*const sSafariBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
     SafariHandleLinkStandbyMsg,
     SafariHandleResetActionMoveSelection,
     SafariHandleCmd55,
+    SafariHandleBattleDebug,
     nullsub_115
 };
 
@@ -689,6 +691,11 @@ static void SafariHandleCmd55(void)
     SafariBufferExecCompleted();
     if ((gBattleTypeFlags & BATTLE_TYPE_LINK) && !(gBattleTypeFlags & BATTLE_TYPE_IS_MASTER))
         gBattlerControllerFuncs[gActiveBattler] = sub_81595E4;
+}
+
+static void SafariHandleBattleDebug(void)
+{
+    SafariBufferExecCompleted();
 }
 
 static void nullsub_115(void)

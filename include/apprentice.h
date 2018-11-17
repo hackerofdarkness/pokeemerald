@@ -9,8 +9,7 @@ struct ApprenticeTrainer
     u16 otId;
     u8 facilityClass;
     u16 species[APPRENTICE_SPECIES_COUNT];
-    u8 id;
-    u16 easyChatWords[6];
+    u8 rest[14];
 };
 
 extern const struct ApprenticeTrainer gApprentices[];

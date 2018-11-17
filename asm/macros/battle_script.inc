@@ -29,11 +29,11 @@
 	.byte 0x6
 	.endm
 
-	.macro adjustnormaldamage
+	.macro adjustdamage
 	.byte 0x7
 	.endm
 
-	.macro adjustnormaldamage2
+	.macro multihitresultmessage
 	.byte 0x8
 	.endm
 
@@ -150,7 +150,7 @@
 	.macro jumpifsideaffecting battler, sidestatus, param2
 	.byte 0x1f
 	.byte \battler
-	.2byte \sidestatus
+	.4byte \sidestatus
 	.4byte \param2
 	.endm
 
@@ -356,11 +356,8 @@
 	.4byte \param0
 	.endm
 
-	.macro jumpiftype2 battler, type, param2
+	.macro setroost
 	.byte 0x42
-	.byte \battler
-	.byte \type
-	.4byte \param2
 	.endm
 
 	.macro jumpifabilitypresent ability, param1
@@ -404,8 +401,9 @@
 	.byte \param1
 	.endm
 
-	.macro typecalc2
+	.macro sethealblock ptr
 	.byte 0x4a
+	.4byte \ptr
 	.endm
 
 	.macro returnatktoball
@@ -561,8 +559,9 @@
 	.byte 0x68
 	.endm
 
-	.macro adjustsetdamage
+	.macro setgravity ptr
 	.byte 0x69
+	.4byte \ptr
 	.endm
 
 	.macro removeitem battler
@@ -591,7 +590,7 @@
 	.byte \battler
 	.endm
 
-	.macro recordlastability battler
+	.macro recordability battler
 	.byte 0x70
 	.byte \battler
 	.endm
@@ -679,8 +678,9 @@
 	.4byte \param0
 	.endm
 
-	.macro nop
+	.macro setmiracleeye ptr
 	.byte 0x83
+	.4byte \ptr
 	.endm
 
 	.macro jumpifcantmakeasleep param0
@@ -702,7 +702,7 @@
 	.4byte \param0
 	.endm
 
-	.macro negativedamage
+	.macro setdrainedhp
 	.byte 0x88
 	.endm
 
@@ -863,8 +863,9 @@
 	.byte 0xab
 	.endm
 
-	.macro remaininghptopower
+	.macro settailwind ptr
 	.byte 0xac
+	.4byte \ptr
 	.endm
 
 	.macro tryspiteppreduce param0
@@ -895,7 +896,7 @@
 	.4byte \param0
 	.endm
 
-	.macro rolloutdamagecalculation
+	.macro handlerollout
 	.byte 0xb3
 	.endm
 
@@ -905,12 +906,13 @@
 	.4byte \param1
 	.endm
 
-	.macro furycuttercalc
+	.macro handlefurycutter
 	.byte 0xb5
 	.endm
 
-	.macro happinesstodamagecalculation
+	.macro setembargo ptr
 	.byte 0xb6
+	.4byte \ptr
 	.endm
 
 	.macro presentdamagecalculation
@@ -957,8 +959,9 @@
 	.4byte \param0
 	.endm
 
-	.macro hiddenpowercalc
+	.macro setstickyweb ptr
 	.byte 0xc1
+	.4byte \ptr
 	.endm
 
 	.macro selectfirstvalidtarget
@@ -1050,13 +1053,14 @@
 	.4byte \param1
 	.endm
 
-	.macro trysetroots param0
+	.macro settoxicspikes ptr
 	.byte 0xd5
-	.4byte \param0
+	.4byte \ptr
 	.endm
 
-	.macro doubledamagedealtifdamaged
+	.macro setgastroacid ptr
 	.byte 0xd6
+	.4byte \ptr
 	.endm
 
 	.macro setyawn param0
@@ -1069,7 +1073,7 @@
 	.4byte \param0
 	.endm
 
-	.macro scaledamagebyhealthratio
+	.macro setroom
 	.byte 0xd9
 	.endm
 
@@ -1083,13 +1087,15 @@
 	.4byte \param0
 	.endm
 
-	.macro trysetgrudge param0
+	.macro setstealthrock param0
 	.byte 0xdc
 	.4byte \param0
 	.endm
 
-	.macro weightdamagecalculation
+	.macro setuserstatus3 flags ptr
 	.byte 0xdd
+	.4byte \flags
+	.4byte \ptr
 	.endm
 
 	.macro asistattackselect param0
@@ -1144,8 +1150,9 @@
 	.4byte \param0
 	.endm
 
-	.macro setweatherballtype
+	.macro jumpifsubstituteblocks ptr
 	.byte 0xe9
+	.4byte \ptr
 	.endm
 
 	.macro tryrecycleitem param0
@@ -1214,6 +1221,41 @@
 	.byte \param0
 	.endm
 	
+	.macro settelekinesis ptr
+	.byte 0xf9
+	.4byte \ptr
+	.endm
+	
+	.macro swapstatstages stat
+	.byte 0xfa
+	.byte \stat
+	.endm
+	
+	.macro averagestats stat
+	.byte 0xfb
+	.byte \stat
+	.endm
+	
+	.macro jumpifoppositegenders ptr
+	.byte 0xfc
+	.4byte \ptr
+	.endm
+	
+	.macro trygetbaddreamstarget ptr
+	.byte 0xfd
+	.4byte \ptr
+	.endm
+	
+	.macro tryworryseed ptr
+	.byte 0xfe
+	.4byte \ptr
+	.endm
+	
+	.macro metalburstdamagecalculator ptr
+	.byte 0xff
+	.4byte \ptr
+	.endm
+	
 @ various command changed to more readable macros
 	.macro cancelmultiturnmoves battler
 	various \battler, VARIOUS_CANCEL_MULTI_TURN_MOVES
@@ -1251,20 +1293,20 @@
 	various \battler, 8
 	.endm
 	
-	.macro arenajudgmentwindow
-	various BS_ATTACKER, VARIOUS_ARENA_JUDGMENT_WINDOW
+	.macro various9 battler
+	various \battler, 9
 	.endm
 	
-	.macro arenaopponentmonlost
-	various BS_ATTACKER, VARIOUS_ARENA_OPPONENT_MON_LOST
+	.macro various10 battler
+	various \battler, 10
 	.endm
 	
-	.macro arenaplayermonlost
-	various BS_ATTACKER, VARIOUS_ARENA_PLAYER_MON_LOST
+	.macro various11 battler
+	various \battler, 11
 	.endm
 	
-	.macro arenabothmonlost
-	various BS_ATTACKER, VARIOUS_ARENA_BOTH_MONS_LOST
+	.macro various12 battler
+	various \battler, 12
 	.endm
 	
 	.macro forfeityesnobox battler
@@ -1279,12 +1321,12 @@
 	various \battler, 15
 	.endm
 	
-	.macro arenajudmengtstring id
-	various \id, VARIOUS_ARENA_JUDGMENT_STRING
+	.macro various16 battler
+	various \battler, 16
 	.endm
 	
-	.macro arenawaitmessage id
-	various \id, VARIOUS_ARENA_WAIT_STRING
+	.macro various17 battler
+	various \battler, 17
 	.endm
 	
 	.macro waitcry battler
@@ -1307,7 +1349,7 @@
 	various BS_ATTACKER, VARIOUS_VOLUME_UP
 	.endm
 	
-	.macro setalreadystatusedmoveattempt battler
+	.macro various23 battler
 	various \battler, 23
 	.endm
 	
@@ -1323,6 +1365,208 @@
 	various \battler, VARIOUS_PLAY_TRAINER_DEFEATED_MUSIC
 	.endm
 	
+	.macro stattextbuffer battler
+	various \battler, VARIOUS_STAT_TEXT_BUFFER
+	.endm
+	
+	.macro switchinabilities battler
+	various \battler, VARIOUS_SWITCHIN_ABILITIES
+	.endm
+	
+	.macro savetarget
+	various BS_TARGET, VARIOUS_SAVE_TARGET
+	.endm
+	
+	.macro restoretarget
+	various BS_TARGET, VARIOUS_RESTORE_TARGET
+	.endm
+	
+	.macro instanthpdrop battler
+	various \battler, VARIOUS_INSTANT_HP_DROP
+	.endm
+	
+	.macro clearstatus battler
+	various \battler, VARIOUS_CLEAR_STATUS
+	.endm
+	
+	.macro restorepp battler
+	various \battler, VARIOUS_RESTORE_PP
+	.endm
+	
+	.macro tryactivatemoxie battler
+	various \battler, VARIOUS_TRY_ACTIVATE_MOXIE
+	.endm
+	
+	.macro tryactivatefellstinger battler
+	various \battler, VARIOUS_TRY_ACTIVATE_FELL_STINGER
+	.endm
+	
+	.macro playmoveanimation battler move
+	various \battler, VARIOUS_PLAY_MOVE_ANIMATION
+	.2byte \move
+	.endm
+	
+	.macro setluckychant battler ptr
+	various \battler VARIOUS_SET_LUCKY_CHANT
+	.4byte \ptr
+	.endm
+	
+	.macro suckerpunchcheck ptr
+	various BS_ATTACKER, VARIOUS_SUCKER_PUNCH_CHECK
+	.4byte \ptr
+	.endm
+	
+	.macro setabilitysimple battler ptr
+	various \battler VARIOUS_SET_SIMPLE_BEAM
+	.4byte \ptr
+	.endm
+	
+	.macro tryentrainment ptr
+	various BS_ATTACKER, VARIOUS_TRY_ENTRAINMENT
+	.4byte \ptr
+	.endm
+	
+	.macro setlastusedability battler
+	various \battler, VARIOUS_SET_LAST_USED_ABILITY
+	.endm
+	
+	.macro tryhealpulse battler ptr
+	various \battler, VARIOUS_TRY_HEAL_PULSE
+	.4byte \ptr
+	.endm
+	
+	.macro tryquash ptr
+	various BS_ATTACKER, VARIOUS_TRY_QUASH
+	.4byte \ptr
+	.endm
+	
+	.macro tryafteryou ptr
+	various BS_ATTACKER, VARIOUS_AFTER_YOU
+	.4byte \ptr
+	.endm
+	
+	.macro trybestow ptr
+	various BS_ATTACKER, VARIOUS_BESTOW
+	.4byte \ptr
+	.endm
+	
+	.macro invertstatstages battler
+	various \battler, VARIOUS_INVERT_STAT_STAGES
+	.endm
+	
+	.macro setterrain ptr
+	various BS_ATTACKER, VARIOUS_SET_TERRAIN
+	.4byte \ptr
+	.endm
+	
+	.macro trymefirst ptr
+	various BS_ATTACKER, VARIOUS_TRY_ME_FIRST
+	.4byte \ptr
+	.endm
+	
+	.macro jumpifbattleend ptr
+	various BS_ATTACKER, VARIOUS_JUMP_IF_BATTLE_END
+	.4byte \ptr
+	.endm
+	
+	.macro tryelectrify ptr
+	various BS_ATTACKER, VARIOUS_TRY_ELECTRIFY
+	.4byte \ptr
+	.endm
+	
+	.macro tryreflecttype ptr
+	various BS_ATTACKER, VARIOUS_TRY_REFLECT_TYPE
+	.4byte \ptr
+	.endm
+	
+	.macro trysoak ptr
+	various BS_ATTACKER, VARIOUS_TRY_SOAK
+	.4byte \ptr
+	.endm
+	
+	.macro handlemegaevo battler
+	various \battler, VARIOUS_HANDLE_MEGA_EVO
+	.endm
+	
+	.macro jumpifcantuselastresort battler ptr
+	various \battler, VARIOUS_TRY_LAST_RESORT
+	.4byte \ptr
+	.endm
+	
+	.macro argumentstatuseffect
+	various BS_ATTACKER, VARIOUS_ARGUMENT_STATUS_EFFECT
+	.endm
+	
+	.macro tryhitswitchtarget ptr
+	various BS_ATTACKER, VARIOUS_TRY_HIT_SWITCH_TARGET
+	.4byte \ptr
+	.endm
+	
+	.macro tryautonomize battler ptr
+	various \battler, VARIOUS_TRY_AUTONOMIZE
+	.4byte \ptr
+	.endm
+	
+	.macro jumpifcantusesynchronoise ptr
+	various BS_ATTACKER, VARIOUS_TRY_SYNCHRONOISE
+	.4byte \ptr
+	.endm
+	
+	.macro trycopycat ptr
+	various BS_ATTACKER, VARIOUS_TRY_COPYCAT
+	.4byte \ptr
+	.endm
+	
+	.macro showabilitypopup battler
+	various \battler, VARIOUS_ABILITY_POPUP
+	.endm
+	
+	.macro defogclear battler, clear, ptr
+	various \battler, VARIOUS_DEFOG
+	.byte \clear
+	.4byte \ptr
+	.endm
+	
+	.macro jumpiftargetally ptr
+	various BS_ATTACKER, VARIOUS_JUMP_IF_TARGET_ALLY
+	.4byte \ptr
+	.endm
+	
+	.macro trypsychoshift ptr
+	various BS_ATTACKER, VARIOUS_PSYCHO_SHIFT
+	.4byte \ptr
+	.endm
+	
+	.macro curestatus battler
+	various \battler, VARIOUS_CURE_STATUS
+	.endm
+	
+	.macro powertrick battler
+	various \battler, VARIOUS_POWER_TRICK
+	.endm
+	
+	.macro argumenttomoveeffect
+	various BS_ATTACKER, VARIOUS_ARGUMENT_TO_MOVE_EFFECT
+	.endm
+	
+	.macro jumpifnotgrounded battler, ptr
+	various \battler, VARIOUS_JUMP_IF_NOT_GROUNDED
+	.4byte \ptr
+	.endm
+	
+	.macro handletrainerslidemsg battler, field
+	various \battler, VARIOUS_HANDLE_TRAINER_SLIDE_MSG
+	.byte \field
+	.endm
+	
+	.macro trytrainerslidefirstdownmsg battler
+	various \battler, VARIOUS_TRY_TRAINER_SLIDE_MSG_FIRST_OFF
+	.endm
+	
+	.macro trytrainerslidelastonmsg battler
+	various \battler, VARIOUS_TRY_TRAINER_SLIDE_MSG_LAST_ON
+	.endm
+
 @ helpful macros
 	.macro setstatchanger stat, stages, down
 	setbyte sSTATCHANGER \stat | \stages << 4 | \down << 7
@@ -1330,6 +1574,7 @@
 	
 	.macro setmoveeffect effect
 	setbyte cEFFECT_CHOOSER \effect
+	setbyte sSAVED_MOVE_EFFECT \effect
 	.endm
 	
 	.macro chosenstatus1animation battler, status
@@ -1379,7 +1624,11 @@
 	.macro jumpifnotmove move, jumpptr
 	jumpifhalfword CMP_NOT_EQUAL, gCurrentMove, \move, \jumpptr
 	.endm
-	
+
+	.macro jumpifnotchosenmove move, jumpptr
+	jumpifhalfword CMP_NOT_EQUAL, gChosenMove, \move, \jumpptr
+	.endm
+
 	.macro jumpifstatus3 battler, status, jumpptr
 	jumpifstatus3condition \battler, \status, 0x0, \jumpptr
 	.endm
@@ -1398,4 +1647,16 @@
 	
 	.macro jumpifnotbattletype flags, jumpptr
 	jumpifword CMP_NO_COMMON_BITS, gBattleTypeFlags, \flags, \jumpptr
+	.endm
+	
+	.macro dmg_1_8_targethp
+	manipulatedamage ATK80_1_8_TARGET_HP
+	.endm
+	
+	.macro dmgtomaxattackerhp
+	manipulatedamage ATK80_FULL_ATTACKER_HP
+	.endm
+	
+	.macro dmgtocurrattackerhp
+	manipulatedamage ATK80_CURR_ATTACKER_HP
 	.endm

@@ -17,6 +17,7 @@
 #define CHAR_PERIOD         0xAD
 #define CHAR_HYPHEN         0xAE
 #define CHAR_ELLIPSIS       0xB0
+#define CHAR_APOS           0xB4
 #define CHAR_MALE           0xB5
 #define CHAR_FEMALE         0xB6
 #define CHAR_CURRENCY       0xB7
@@ -114,7 +115,7 @@ enum {
     FONTATTR_MAX_LETTER_HEIGHT,
     FONTATTR_LETTER_SPACING,
     FONTATTR_LINE_SPACING,
-    FONTATTR_UNKNOWN,   // dunno what this is yet
+    FONTATTR_COLOR_LOWNIBBLE,   // dunno what this is yet
     FONTATTR_COLOR_FOREGROUND,
     FONTATTR_COLOR_BACKGROUND,
     FONTATTR_COLOR_SHADOW
@@ -122,18 +123,23 @@ enum {
 
 struct TextPrinterSubStruct
 {
-    u8 glyphId:4;  // 0x14
-    bool8 hasPrintBeenSpedUp:1;
-    u8 unk:3;
-    u8 downArrowDelay:5;
-    u8 downArrowYPosIdx:2;
-    bool8 hasGlyphIdBeenSet:1;
-    u8 autoScrollDelay;
+    u8 font_type:4;  // 0x14
+    u8 font_type_upper:1;
+    u8 font_type_5:3;
+    u8 field_1:5;
+    u8 field_1_upmid:2;
+    u8 field_1_top:1;
+    u8 frames_visible_counter;
+    u8 field_3;
+    u8 field_4; // 0x18
+    u8 field_5;
+    u8 field_6;
+    u8 active;
 };
 
-struct TextPrinterTemplate
+struct TextSubPrinter // TODO: Better name
 {
-    const u8* currentChar;
+    const u8* current_text_offset;
     u8 windowId;
     u8 fontId;
     u8 x;
@@ -142,7 +148,7 @@ struct TextPrinterTemplate
     u8 currentY;
     u8 letterSpacing;
     u8 lineSpacing;
-    u8 unk:4;   // 0xC
+    u8 fontColor_l:4;   // 0xC
     u8 fgColor:4;
     u8 bgColor:4;
     u8 shadowColor:4;
@@ -150,18 +156,18 @@ struct TextPrinterTemplate
 
 struct TextPrinter
 {
-    struct TextPrinterTemplate printerTemplate;
+    struct TextSubPrinter subPrinter;
 
-    void (*callback)(struct TextPrinterTemplate *, u16); // 0x10
+    void (*callback)(struct TextSubPrinter *, u16); // 0x10
 
-    union __attribute__((packed)) {
+    union {
         struct TextPrinterSubStruct sub;
-        u8 fields[7];
-    } subUnion;
 
-    u8 active;
+        u8 sub_fields[8];
+    } sub_union;
+
     u8 state;       // 0x1C
-    u8 textSpeed;
+    u8 text_speed;
     u8 delayCounter;
     u8 scrollDistance;
     u8 minLetterSpacing;  // 0x20
@@ -175,7 +181,7 @@ struct FontInfo
     u8 maxLetterHeight;
     u8 letterSpacing;
     u8 lineSpacing;
-    u8 unk:4;
+    u8 fontColor_l:4;
     u8 fgColor:4;
     u8 bgColor:4;
     u8 shadowColor:4;
@@ -185,33 +191,23 @@ extern const struct FontInfo *gFonts;
 
 struct GlyphWidthFunc
 {
-    u32 fontId;
+    u32 font_id;
     u32 (*func)(u16 glyphId, bool32 isJapanese);
 };
 
 struct KeypadIcon
 {
-    u16 tileOffset;
+    u16 tile_offset;
     u8 width;
     u8 height;
 };
 
 typedef struct {
-    bool8 canABSpeedUpPrint:1;
-    bool8 useAlternateDownArrow:1;
-    bool8 autoScroll:1;
-    bool8 forceMidTextSpeed:1;
+    u8 flag_0:1;
+    u8 flag_1:1;
+    u8 flag_2:1;
+    u8 flag_3:1;
 } TextFlags;
-
-struct Struct_03002F90
-{
-    u8 unk0[0x20];
-    u8 unk20[0x20];
-    u8 unk40[0x20];
-    u8 unk60[0x20];
-    u8 unk80;
-    u8 unk81;
-};
 
 extern TextFlags gTextFlags;
 
@@ -220,13 +216,17 @@ extern u8 gStringVar2[];
 extern u8 gStringVar3[];
 extern u8 gStringVar4[];
 
-extern u8 gUnknown_03002F84;
-extern struct Struct_03002F90 gUnknown_03002F90;
+u8 gUnknown_03002F84;
+u8 gUnknown_03002F90[0x20];
+u8 gUnknown_03002FB0[0x20];
+u8 gUnknown_03002FD0[0x20];
+u8 gUnknown_03002FF0[0x20];
+u8 gGlyphDimensions[0x2];
 
 void SetFontsPointer(const struct FontInfo *fonts);
 void DeactivateAllTextPrinters(void);
-u16 AddTextPrinterParameterized(u8 windowId, u8 fontId, const u8 *str, u8 x, u8 y, u8 speed, void (*callback)(struct TextPrinterTemplate *, u16));
-bool16 AddTextPrinter(struct TextPrinterTemplate *template, u8 speed, void (*callback)(struct TextPrinterTemplate *, u16));
+u16 AddTextPrinterParameterized(u8 windowId, u8 fontId, const u8 *str, u8 x, u8 y, u8 speed, void (*callback)(struct TextSubPrinter *, u16));
+bool16 AddTextPrinter(struct TextSubPrinter *textSubPrinter, u8 speed, void (*callback)(struct TextSubPrinter *, u16));
 void RunTextPrinters(void);
 bool16 IsTextPrinterActive(u8 id);
 u32 RenderFont(struct TextPrinter *textPrinter);

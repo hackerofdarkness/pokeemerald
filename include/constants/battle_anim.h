@@ -298,8 +298,8 @@
 #define ANIM_TAG_BLUE_RING_2                (ANIM_SPRITES_START + 288)
 
 // battlers
-#define ANIM_ATTACKER    0
-#define ANIM_TARGET      1
+#define ANIM_ATTACKER 0
+#define ANIM_TARGET 1
 #define ANIM_ATK_PARTNER 2
 #define ANIM_DEF_PARTNER 3
 
@@ -370,6 +370,7 @@
 #define B_ANIM_FOCUS_PUNCH_SETUP        0x14
 #define B_ANIM_INGRAIN_HEAL             0x15
 #define B_ANIM_WISH_HEAL                0x16
+#define B_ANIM_MEGA_EVOLUTION           0x17
 
 // special animations table
 #define B_ANIM_LVL_UP                   0x0

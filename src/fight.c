@@ -112,6 +112,17 @@ const struct SpriteTemplate gFistFootSpriteTemplate =
     .callback = sub_810CEE0,
 };
 
+const struct SpriteTemplate gPalmSpriteTemplate =
+{
+	.tileTag = ANIM_TAG_PURPLE_HAND_OUTLINE,
+	.paletteTag = ANIM_TAG_PURPLE_HAND_OUTLINE,
+	.oam = &gUnknown_08524914,
+	.anims = gUnknown_08595E54,
+	.images = NULL,
+	.affineAnims = gDummySpriteAffineAnimTable,
+	.callback = sub_810CEE0,
+};
+
 const struct SpriteTemplate gUnknown_08595EB0 =
 {
     .tileTag = ANIM_TAG_HANDS_AND_FEET,
@@ -280,6 +291,17 @@ const struct SpriteTemplate gUnknown_0859601C =
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = sub_810D874,
+};
+
+const struct SpriteTemplate gAuraSphereBlast =
+{
+	.tileTag = ANIM_TAG_CIRCLE_OF_LIGHT,
+	.paletteTag = ANIM_TAG_CIRCLE_OF_LIGHT,
+	.oam = &gUnknown_0852491C,
+	.anims = gDummySpriteAnimTable,
+	.images = NULL,
+	.affineAnims = gDummySpriteAffineAnimTable,
+	.callback = sub_810D874,
 };
 
 const struct SpriteTemplate gUnknown_08596034 =

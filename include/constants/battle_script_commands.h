@@ -5,7 +5,7 @@
 #define sPAINSPLIT_HP gBattleScripting
 #define sBIDE_DMG gBattleScripting + 4
 #define sMULTIHIT_STRING gBattleScripting + 8
-#define sDMG_MULTIPLIER gBattleScripting + 0xE
+#define sEXP_CATCH gBattleScripting + 0xE
 #define sTWOTURN_STRINGID gBattleScripting + 0xF
 #define sB_ANIM_ARG1 gBattleScripting + 0x10
 #define sB_ANIM_ARG2 gBattleScripting + 0x11
@@ -29,6 +29,9 @@
 #define sWINDOWS_TYPE gBattleScripting + 0x24
 #define sMULTIPLAYER_ID gBattleScripting + 0x25
 #define sSPECIAL_TRAINER_BATTLE_TYPE gBattleScripting + 0x26
+#define sMON_CAUGHT gBattleScripting + 0x27
+#define sSAVED_DMG gBattleScripting + 0x28
+#define sSAVED_MOVE_EFFECT gBattleScripting + 0x2C
 
 #define cEFFECT_CHOOSER gBattleCommunication + 3
 #define cMULTISTRING_CHOOSER gBattleCommunication + 5
@@ -47,9 +50,9 @@
 #define BS_OPPONENT1                12
 #define BS_PLAYER2                  13
 #define BS_OPPONENT2                14
+#define BS_ABILITY_BATTLER			15
 
 // atk 01, accuracy calc
-#define NO_ACC_CALC 0xFFFE
 #define NO_ACC_CALC_CHECK_LOCK_ON 0xFFFF
 #define ACC_CURR_MOVE 0
 
@@ -68,26 +71,66 @@
 #define VARIOUS_GET_MOVE_TARGET                 3
 #define VARIOUS_RESET_INTIMIDATE_TRACE_BITS     5
 #define VARIOUS_UPDATE_CHOICE_MOVE_ON_LVL_UP    6
-#define VARIOUS_ARENA_JUDGMENT_WINDOW           9
-#define VARIOUS_ARENA_OPPONENT_MON_LOST         10
-#define VARIOUS_ARENA_PLAYER_MON_LOST           11
-#define VARIOUS_ARENA_BOTH_MONS_LOST            12
 #define VARIOUS_EMIT_YESNOBOX                   13
-#define VARIOUS_ARENA_JUDGMENT_STRING           16
-#define VARIOUS_ARENA_WAIT_STRING               17
 #define VARIOUS_WAIT_CRY                        18
 #define VARIOUS_RETURN_OPPONENT_MON1            19
 #define VARIOUS_RETURN_OPPONENT_MON2            20
 #define VARIOUS_VOLUME_DOWN                     21
 #define VARIOUS_VOLUME_UP                       22
-#define VARIOUS_SET_ALREADY_STATUS_MOVE_ATTEMPT 23
 #define VARIOUS_SET_TELEPORT_OUTCOME            25
 #define VARIOUS_PLAY_TRAINER_DEFEATED_MUSIC     26
+#define VARIOUS_STAT_TEXT_BUFFER                27
+#define VARIOUS_SWITCHIN_ABILITIES              28
+#define VARIOUS_SAVE_TARGET                     29
+#define VARIOUS_RESTORE_TARGET                  30
+#define VARIOUS_INSTANT_HP_DROP                 31
+#define VARIOUS_CLEAR_STATUS                    32
+#define VARIOUS_RESTORE_PP                      33
+#define VARIOUS_TRY_ACTIVATE_MOXIE              34
+#define VARIOUS_TRY_ACTIVATE_FELL_STINGER       35
+#define VARIOUS_PLAY_MOVE_ANIMATION             36
+#define VARIOUS_SET_LUCKY_CHANT                 37
+#define VARIOUS_SUCKER_PUNCH_CHECK              38
+#define VARIOUS_SET_SIMPLE_BEAM                 39
+#define VARIOUS_TRY_ENTRAINMENT                 40
+#define VARIOUS_SET_LAST_USED_ABILITY           41
+#define VARIOUS_TRY_HEAL_PULSE                  42
+#define VARIOUS_TRY_QUASH                       43
+#define VARIOUS_INVERT_STAT_STAGES              44
+#define VARIOUS_SET_TERRAIN                     45
+#define VARIOUS_TRY_ME_FIRST                    46
+#define VARIOUS_JUMP_IF_BATTLE_END              47
+#define VARIOUS_TRY_ELECTRIFY                   48
+#define VARIOUS_TRY_REFLECT_TYPE                49
+#define VARIOUS_TRY_SOAK                        50
+#define VARIOUS_HANDLE_MEGA_EVO					51
+#define VARIOUS_TRY_LAST_RESORT					52
+#define VARIOUS_ARGUMENT_STATUS_EFFECT			53
+#define VARIOUS_TRY_HIT_SWITCH_TARGET			54
+#define VARIOUS_TRY_AUTONOMIZE					55
+#define VARIOUS_TRY_COPYCAT						56
+#define VARIOUS_ABILITY_POPUP					57
+#define VARIOUS_DEFOG							58
+#define VARIOUS_JUMP_IF_TARGET_ALLY				59
+#define VARIOUS_TRY_SYNCHRONOISE				60
+#define VARIOUS_PSYCHO_SHIFT					61
+#define VARIOUS_CURE_STATUS						62
+#define VARIOUS_POWER_TRICK						63
+#define VARIOUS_AFTER_YOU						64
+#define VARIOUS_BESTOW							65
+#define VARIOUS_ARGUMENT_TO_MOVE_EFFECT			66
+#define VARIOUS_JUMP_IF_NOT_GROUNDED			67
+#define VARIOUS_HANDLE_TRAINER_SLIDE_MSG		68
+#define VARIOUS_TRY_TRAINER_SLIDE_MSG_FIRST_OFF 69
+#define VARIOUS_TRY_TRAINER_SLIDE_MSG_LAST_ON 	70
 
 // atk80, dmg manipulation
 #define ATK80_DMG_CHANGE_SIGN                               0
 #define ATK80_DMG_HALF_BY_TWO_NOT_MORE_THAN_HALF_MAX_HP     1
 #define ATK80_DMG_DOUBLED                                   2
+#define ATK80_1_8_TARGET_HP                                 3
+#define ATK80_FULL_ATTACKER_HP                              4
+#define ATK80_CURR_ATTACKER_HP                              5
 
 // atk4F, a flag used for the jumpifcantswitch command
 #define ATK4F_DONT_CHECK_STATUSES   0x80

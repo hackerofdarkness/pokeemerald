@@ -58,7 +58,7 @@ extern void sub_81C5924(void);
 extern void sub_81C59BC(void);
 extern void sub_81AB9A8(u8);
 extern void sub_81ABA88(u8);
-extern void StartEscapeRopeFieldEffect(void);
+extern void sub_80B7CC8(void);
 extern u8* sub_806CF78(u16);
 extern void sub_81B89F0(void);
 extern u8 GetItemEffectType(u16);
@@ -890,7 +890,7 @@ void ItemUseOutOfBattle_BlackWhiteFlute(u8 taskId)
 void task08_080A1C44(u8 taskId)
 {
     ResetInitialPlayerAvatarState();
-    StartEscapeRopeFieldEffect();
+    sub_80B7CC8();
     DestroyTask(taskId);
 }
 
@@ -931,7 +931,26 @@ void ItemUseOutOfBattle_EvolutionStone(u8 taskId)
 
 void ItemUseInBattle_PokeBall(u8 taskId)
 {
-    if (IsPlayerPartyAndPokemonStorageFull() == FALSE) // have room for mon?
+    if (IsBattlerAlive(GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT))
+        && IsBattlerAlive(GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT))) // There are two present pokemon.
+    {
+        u8 textCantThrowPokeBall[] = _("Cannot throw a ball!\nThere are two pokemon out there!\p");
+
+        if (!InBattlePyramid())
+            DisplayItemMessage(taskId, 1, textCantThrowPokeBall, bag_menu_inits_lists_menu);
+        else
+            DisplayItemMessageInBattlePyramid(taskId, textCantThrowPokeBall, sub_81C6714);
+    }
+    else if (gBattlerInMenuId == GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT)) // Attempting to throw a ball with the second pokemon.
+    {
+        u8 textCantThrowPokeBall[] = _("Cannot throw a ball!\p");
+
+        if (!InBattlePyramid())
+            DisplayItemMessage(taskId, 1, textCantThrowPokeBall, bag_menu_inits_lists_menu);
+        else
+            DisplayItemMessageInBattlePyramid(taskId, textCantThrowPokeBall, sub_81C6714);
+    }
+    else if (IsPlayerPartyAndPokemonStorageFull() == FALSE) // have room for mon?
     {
         RemoveBagItem(gSpecialVar_ItemId, 1);
         if (!InBattlePyramid())
@@ -944,7 +963,9 @@ void ItemUseInBattle_PokeBall(u8 taskId)
         DisplayItemMessage(taskId, 1, gText_BoxFull, bag_menu_inits_lists_menu);
     }
     else
+    {
         DisplayItemMessageInBattlePyramid(taskId, gText_BoxFull, sub_81C6714);
+    }
 }
 
 void sub_80FE408(u8 taskId)

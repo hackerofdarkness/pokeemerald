@@ -531,3 +531,37 @@
 	.include "data/maps/Route119_House/events.inc"
 	.include "data/maps/Route124_DivingTreasureHuntersHouse/events.inc"
 
+
+	.include "data/maps/ZaurakCity/events.inc"
+
+	.include "data/maps/ZaurakCity_Apartments_1F/events.inc"
+
+	.include "data/maps/ZaurakCity_Apartments_2F/events.inc"
+
+	.include "data/maps/ZaurakCity_Apartments_3F/events.inc"
+
+	.include "data/maps/ZaurakCity_PlayerHouse/events.inc"
+
+	.include "data/maps/ZaurakCity_PlayerBedroom/events.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_3F/events.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_4F/events.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_5F/events.inc"
+
+	.include "data/maps/ZaurakCity_HospitalElevator/events.inc"
+
+	.include "data/maps/NewMap5/events.inc"
+
+	.include "data/maps/NewMap6/events.inc"
+
+	.include "data/maps/NewMap7/events.inc"
+
+	.include "data/maps/NewMap8/events.inc"
+
+	.include "data/maps/NewMap9/events.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_2F/events.inc"
+
+	.include "data/maps/ZaurakCity_Hospital_1F/events.inc"

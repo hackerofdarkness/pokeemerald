@@ -4,10 +4,11 @@
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "field_camera.h"
+#include "field_player_avatar.h"
 #include "field_effect.h"
 #include "field_effect_helpers.h"
-#include "field_player_avatar.h"
 #include "fieldmap.h"
+#include "global.fieldmap.h"
 #include "menu.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
@@ -24,7 +25,6 @@
 #include "constants/abilities.h"
 #include "constants/event_objects.h"
 #include "constants/event_object_movement_constants.h"
-#include "constants/field_effects.h"
 #include "constants/flags.h"
 #include "constants/maps.h"
 #include "constants/moves.h"
@@ -32,18 +32,42 @@
 #include "constants/species.h"
 
 static EWRAM_DATA u8 gUnknown_0203734C = 0;
-EWRAM_DATA struct EventObject gEventObjects[EVENT_OBJECTS_COUNT] = {};
+EWRAM_DATA struct EventObject gEventObjects[NUM_EVENT_OBJECTS] = {};
 EWRAM_DATA struct PlayerAvatar gPlayerAvatar = {};
 
-// static declarations
-
+static void StartStrengthAnim(u8, u8);
+static bool8 ShouldJumpLedge(s16, s16, u8);
+static bool8 sub_808B1BC(s16, s16, u8);
+static u8 sub_808B164(struct EventObject *, s16, s16, u8, u8);
+static u8 sub_808B238(s16, s16, u8);
+static void check_acro_bike_metatile(s16, s16, u8, u8 *);
+static void PlayerNotOnBikeCollide(u8);
+static void PlayCollisionSoundIfNotFacingWarp(u8 a);
+static void PlayerNotOnBikeCollideWithFarawayIslandMew(u8);
+static void PlayerRun(u8); 
+static void MovePlayerNotOnBike(u8, u16);
+static u8 CheckMovementInputNotOnBike(u8);
+static void DoPlayerMatSpin(void);
+static void DoPlayerMatJump(void);
+static u8 CheckForPlayerAvatarCollision(u8);
 static u8 EventObjectCB2_NoMovement2();
+static void sub_808C280(struct EventObject *); 
 static bool8 TryInterruptEventObjectSpecialAnim(struct EventObject *, u8);
 static void npc_clear_strange_bits(struct EventObject *);
+static void DoPlayerAvatarTransition(void); 
+static bool8 player_is_anim_in_certain_ranges(void);
+static bool8 sub_808B618(void);
+static bool8 PlayerIsAnimActive(void);
+static bool8 PlayerCheckIfAnimFinishedOrInactive(void);
+static bool8 TryDoMetatileBehaviorForcedMovement();
 static void MovePlayerAvatarUsingKeypadInput(u8, u16, u16);
 static void PlayerAllowForcedMovementIfMovingSameDirection();
-static bool8 TryDoMetatileBehaviorForcedMovement();
+static u8 sub_808B028(u8);
 static u8 GetForcedMovementByMetatileBehavior();
+static void PlayerNotOnBikeNotMoving(u8, u16);
+static void PlayerNotOnBikeTurningInPlace(u8, u16);
+static void PlayerNotOnBikeMoving(u8, u16);
+static void sub_808C750(u8);
 
 static bool8 ForcedMovement_None(void);
 static bool8 ForcedMovement_Slip(void);
@@ -63,63 +87,25 @@ static bool8 ForcedMovement_0xBB(void);
 static bool8 ForcedMovement_0xBC(void);
 static bool8 ForcedMovement_MuddySlope(void);
 
-static void MovePlayerNotOnBike(u8, u16);
-static u8 CheckMovementInputNotOnBike(u8);
-static void PlayerNotOnBikeNotMoving(u8, u16);
-static void PlayerNotOnBikeTurningInPlace(u8, u16);
-static void PlayerNotOnBikeMoving(u8, u16);
-static u8 CheckForPlayerAvatarCollision(u8);
-static u8 sub_808B028(u8);
-static u8 sub_808B164(struct EventObject *, s16, s16, u8, u8);
-static bool8 sub_808B1BC(s16, s16, u8);
-static bool8 ShouldJumpLedge(s16, s16, u8);
-static u8 sub_808B238(s16, s16, u8);
-static void check_acro_bike_metatile(s16, s16, u8, u8 *);
-
-static void DoPlayerAvatarTransition(void);
-static void PlayerAvatarTransition_Dummy(struct EventObject *a);
 static void PlayerAvatarTransition_Normal(struct EventObject *a);
 static void PlayerAvatarTransition_MachBike(struct EventObject *a);
 static void PlayerAvatarTransition_AcroBike(struct EventObject *a);
 static void PlayerAvatarTransition_Surfing(struct EventObject *a);
 static void PlayerAvatarTransition_Underwater(struct EventObject *a);
 static void PlayerAvatarTransition_ReturnToField(struct EventObject *a);
+static void PlayerAvatarTransition_Dummy(struct EventObject *a);
 
-static bool8 player_is_anim_in_certain_ranges(void);
-static bool8 sub_808B618(void);
-static bool8 PlayerIsAnimActive(void);
-static bool8 PlayerCheckIfAnimFinishedOrInactive(void);
-
-static void PlayerRun(u8); 
-static void PlayerNotOnBikeCollide(u8);
-static void PlayerNotOnBikeCollideWithFarawayIslandMew(u8);
-
-static void PlayCollisionSoundIfNotFacingWarp(u8 a);
-
-static void sub_808C280(struct EventObject *);
-
-static void StartStrengthAnim(u8, u8);
-static void Task_BumpBoulder(u8 taskId);
 static u8 sub_808C3A4(struct Task *task, struct EventObject *playerObject, struct EventObject *strengthObject);
 static u8 do_boulder_dust(struct Task *task, struct EventObject *playerObject, struct EventObject *strengthObject);
 static u8 sub_808C484(struct Task *task, struct EventObject *playerObject, struct EventObject *strengthObject);
 
-static void DoPlayerMatJump(void);
-static void DoPlayerAvatarSecretBaseMatJump(u8 taskId);
 static u8 PlayerAvatar_DoSecretBaseMatJump(struct Task *task, struct EventObject *eventObject);
 
-static void DoPlayerMatSpin(void);
-static void PlayerAvatar_DoSecretBaseMatSpin(u8 taskId);
 static bool8 PlayerAvatar_SecretBaseMatSpinStep0(struct Task *task, struct EventObject *eventObject);
 static bool8 PlayerAvatar_SecretBaseMatSpinStep1(struct Task *task, struct EventObject *eventObject);
 static bool8 PlayerAvatar_SecretBaseMatSpinStep2(struct Task *task, struct EventObject *eventObject);
 static bool8 PlayerAvatar_SecretBaseMatSpinStep3(struct Task *task, struct EventObject *eventObject);
 
-static void sub_808C750(u8);
-static void taskFF_0805D1D4(u8 taskId);
-static void sub_808C814(u8 taskId);
-
-static void Task_Fishing(u8 taskId);
 static u8 Fishing1(struct Task *task);
 static u8 Fishing2(struct Task *task);
 static u8 Fishing3(struct Task *task);
@@ -136,13 +122,8 @@ static u8 Fishing13(struct Task *task);
 static u8 Fishing14(struct Task *task);
 static u8 Fishing15(struct Task *task);
 static u8 Fishing16(struct Task *task);
-static void AlignFishingAnimationFrames(void);
 
-static u8 sub_808D38C(struct EventObject *object, s16 *a1);
-
-// .rodata
-
-static bool8 (*const sForcedMovementTestFuncs[])(u8) =
+static bool8 (*const gUnknown_084973FC[])(u8) =
 {
     MetatileBehavior_IsTrickHouseSlipperyFloor,
     MetatileBehavior_IsIce_2,
@@ -164,7 +145,7 @@ static bool8 (*const sForcedMovementTestFuncs[])(u8) =
     MetatileBehavior_IsMuddySlope,
 };
 
-static bool8 (*const sForcedMovementFuncs[])(void) =
+static bool8 (*const gUnknown_08497444[])(void) =
 {
     ForcedMovement_None,
     ForcedMovement_Slip,
@@ -302,15 +283,14 @@ static bool8 (*const sPlayerAvatarSecretBaseMatSpin[])(struct Task *, struct Eve
 };
 
 // .text
-
 void MovementType_Player(struct Sprite *sprite)
 {
-    UpdateEventObjectCurrentMovement(&gEventObjects[sprite->data[0]], sprite, EventObjectCB2_NoMovement2);
+	UpdateEventObjectCurrentMovement(&gEventObjects[sprite->data[0]], sprite, EventObjectCB2_NoMovement2);
 }
 
 static u8 EventObjectCB2_NoMovement2(void)
 {
-    return 0;
+	return 0;
 }
 
 void player_step(u8 direction, u16 newKeys, u16 heldKeys)
@@ -400,7 +380,7 @@ static void PlayerAllowForcedMovementIfMovingSameDirection(void)
 
 static bool8 TryDoMetatileBehaviorForcedMovement(void)
 {
-    return sForcedMovementFuncs[GetForcedMovementByMetatileBehavior()]();
+	return gUnknown_08497444[GetForcedMovementByMetatileBehavior()]();
 }
 
 static u8 GetForcedMovementByMetatileBehavior(void)
@@ -413,7 +393,7 @@ static u8 GetForcedMovementByMetatileBehavior(void)
 
         for (i = 0; i < 18; i++)
         {
-            if (sForcedMovementTestFuncs[i](metatileBehavior))
+            if (gUnknown_084973FC[i](metatileBehavior))
                 return i + 1;
         }
     }
@@ -642,12 +622,12 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
 
     if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_SURFING)
     {
-    // speed 2 is fast, same speed as running
+	// speed 2 is fast, same speed as running
         PlayerGoSpeed2(direction);
         return;
     }
 
-    if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER) && (heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
+    if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER) && (heldKeys & B_BUTTON) 
      && IsRunningDisallowed(gEventObjects[gPlayerAvatar.eventObjectId].currentMetatileBehavior) == 0)
     {
         PlayerRun(direction);
@@ -748,18 +728,18 @@ static u8 sub_808B238(s16 x, s16 y, u8 direction)
     {
         u8 eventObjectId = GetEventObjectIdByXY(x, y);
 
-        if (eventObjectId != 16 && gEventObjects[eventObjectId].graphicsId == EVENT_OBJ_GFX_PUSHABLE_BOULDER)
-        {
-            x = gEventObjects[eventObjectId].currentCoords.x;
-            y = gEventObjects[eventObjectId].currentCoords.y;
-            MoveCoords(direction, &x, &y);
-            if (GetCollisionAtCoords(&gEventObjects[eventObjectId], x, y, direction) == 0
-             && MetatileBehavior_IsNonAnimDoor(MapGridGetMetatileBehaviorAt(x, y)) == 0)
+            if (eventObjectId != 16 && gEventObjects[eventObjectId].graphicsId == 0x57)
             {
-                StartStrengthAnim(eventObjectId, direction);
-                return 1;
+                x = gEventObjects[eventObjectId].currentCoords.x;
+                y = gEventObjects[eventObjectId].currentCoords.y;
+                MoveCoords(direction, &x, &y);
+                if (GetCollisionAtCoords(&gEventObjects[eventObjectId], x, y, direction) == 0
+                 && MetatileBehavior_IsNonAnimDoor(MapGridGetMetatileBehaviorAt(x, y)) == 0)
+                {
+                    StartStrengthAnim(eventObjectId, direction);
+                    return 1;
+                }
             }
-        }
     }
     return 0;
 }
@@ -1001,7 +981,7 @@ void PlayerGoSpeed4(u8 a)
     PlayerSetAnimId(GetWalkFastestMovementAction(a), 2);
 }
 
-static void PlayerRun(u8 a)
+void PlayerRun(u8 a)
 {
     PlayerSetAnimId(GetPlayerRunMovementAction(a), 2);
 }
@@ -1017,13 +997,13 @@ void PlayerOnBikeCollideWithFarawayIslandMew(u8 a)
     PlayerSetAnimId(GetWalkInPlaceNormalMovementAction(a), 2);
 }
 
-static void PlayerNotOnBikeCollide(u8 a)
+void PlayerNotOnBikeCollide(u8 a)
 {
     PlayCollisionSoundIfNotFacingWarp(a);
     PlayerSetAnimId(GetWalkInPlaceSlowMovementAction(a), 2);
 }
 
-static void PlayerNotOnBikeCollideWithFarawayIslandMew(u8 a)
+void PlayerNotOnBikeCollideWithFarawayIslandMew(u8 a)
 {
     PlayerSetAnimId(GetWalkInPlaceSlowMovementAction(a), 2);
 }
@@ -1470,6 +1450,8 @@ static void sub_808C280(struct EventObject *eventObject)
 
 /* Strength */
 
+static void Task_BumpBoulder(u8 taskId);
+
 static void StartStrengthAnim(u8 a, u8 b)
 {
     u8 taskId = CreateTask(Task_BumpBoulder, 0xFF);
@@ -1541,6 +1523,8 @@ static bool8 sub_808C484(struct Task *task, struct EventObject *playerObject, st
 
 /* Some field effect */
 
+static void DoPlayerAvatarSecretBaseMatJump(u8 taskId);
+
 static void DoPlayerMatJump(void)
 {
     DoPlayerAvatarSecretBaseMatJump(CreateTask(DoPlayerAvatarSecretBaseMatJump, 0xFF));
@@ -1572,6 +1556,8 @@ static u8 PlayerAvatar_DoSecretBaseMatJump(struct Task *task, struct EventObject
 }
 
 /* Some field effect */
+
+static void PlayerAvatar_DoSecretBaseMatSpin(u8 taskId);
 
 static void DoPlayerMatSpin(void)
 {
@@ -1646,6 +1632,9 @@ static bool8 PlayerAvatar_SecretBaseMatSpinStep3(struct Task *task, struct Event
 
 /* Some Field effect */
 
+static void taskFF_0805D1D4(u8 taskId);
+static void sub_808C814(u8 taskId);
+
 static void sub_808C750(u8 a)
 {
     u8 taskId;
@@ -1710,6 +1699,9 @@ static bool8 (*const sFishingStateFuncs[])(struct Task *) =
     Fishing16,
 };
 
+static void Task_Fishing(u8 taskId);
+static void sub_808CF78(void);
+
 #define tStep              data[0]
 #define tFrameCounter      data[1]
 #define tNumDots           data[2]
@@ -1767,7 +1759,7 @@ static bool8 Fishing2(struct Task *task)
 
 static bool8 Fishing3(struct Task *task)
 {
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     
     // Wait one second
     task->tFrameCounter++;
@@ -1799,7 +1791,7 @@ static bool8 Fishing5(struct Task *task)
 {
     const u8 dot[] = _("·");
 
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     task->tFrameCounter++;
     if (gMain.newKeys & A_BUTTON)
     {
@@ -1835,7 +1827,7 @@ static bool8 Fishing6(struct Task *task)
 {
     bool8 bite;
 
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     task->tStep++;
     bite = FALSE;
 
@@ -1880,7 +1872,7 @@ static bool8 Fishing6(struct Task *task)
 // Oh! A Bite!
 static bool8 Fishing7(struct Task *task)
 {
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     AddTextPrinterParameterized(0, 1, gText_OhABite, 0, 17, 0, NULL);
     task->tStep++;
     task->tFrameCounter = 0;
@@ -1892,7 +1884,7 @@ static bool8 Fishing8(struct Task *task)
 {
     const s16 reelTimeouts[3] = {36, 33, 30};
 
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     task->tFrameCounter++;
     if (task->tFrameCounter >= reelTimeouts[task->tFishingRod])
         task->tStep = FISHING_GOT_AWAY;
@@ -1911,7 +1903,7 @@ static bool8 Fishing9(struct Task *task)
         {70, 30}
     };
 
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     task->tStep++;
     if (task->tRoundsPlayed < task->tMinRoundsRequired)
     {
@@ -1930,7 +1922,7 @@ static bool8 Fishing9(struct Task *task)
 
 static bool8 Fishing10(struct Task *task)
 {
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     FillWindowPixelBuffer(0, 0x11);
     AddTextPrinterParameterized2(0, 1, gText_PokemonOnHook, 1, 0, 2, 1, 3);
     task->tStep++;
@@ -1941,7 +1933,7 @@ static bool8 Fishing10(struct Task *task)
 static bool8 Fishing11(struct Task *task)
 {
     if (task->tFrameCounter == 0)
-        AlignFishingAnimationFrames();
+        sub_808CF78();
 
     RunTextPrinters();
 
@@ -1977,7 +1969,7 @@ static bool8 Fishing11(struct Task *task)
 // Not even a nibble
 static bool8 Fishing12(struct Task *task)
 {
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingNoCatchDirectionAnimNum(GetPlayerFacingDirection()));
     FillWindowPixelBuffer(0, 0x11);
     AddTextPrinterParameterized2(0, 1, gText_NotEvenANibble, 1, 0, 2, 1, 3);
@@ -1988,7 +1980,7 @@ static bool8 Fishing12(struct Task *task)
 // It got away
 static bool8 Fishing13(struct Task *task)
 {
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingNoCatchDirectionAnimNum(GetPlayerFacingDirection()));
     FillWindowPixelBuffer(0, 0x11);
     AddTextPrinterParameterized2(0, 1, gText_ItGotAway, 1, 0, 2, 1, 3);
@@ -1999,14 +1991,14 @@ static bool8 Fishing13(struct Task *task)
 // Wait one second
 static bool8 Fishing14(struct Task *task)
 {
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     task->tStep++;
     return FALSE;
 }
 
 static bool8 Fishing15(struct Task *task)
 {
-    AlignFishingAnimationFrames();
+    sub_808CF78();
     if (gSprites[gPlayerAvatar.spriteId].animEnded)
     {
         struct EventObject *playerEventObj = &gEventObjects[gPlayerAvatar.eventObjectId];
@@ -2041,7 +2033,7 @@ static bool8 Fishing16(struct Task *task)
 #undef tFrameCounter
 #undef tFishingRod
 
-static void AlignFishingAnimationFrames(void)
+static void sub_808CF78(void)
 {
     struct Sprite *playerSprite = &gSprites[gPlayerAvatar.spriteId];
     u8 animCmdIndex;
@@ -2090,6 +2082,8 @@ static u8 sub_808D080(void)
     return gUnknown_0203734C;
 }
 
+static u8 sub_808D38C(struct EventObject *object, s16 *a1);
+
 static void sub_808D094(u8 taskId)
 {
     struct EventObject *object = &gEventObjects[gPlayerAvatar.eventObjectId];
@@ -2120,7 +2114,7 @@ static void sub_808D094(u8 taskId)
             data[3] -= data[2];
             data[2] += 3;
             sprite->pos1.y = data[3] >> 4;
-            if (sprite->pos1.y + (s16)gTotalCameraPixelOffsetY < -32)
+            if (sprite->pos1.y + (s16)gUnknown_03005DE8 < -32)
             {
                 data[0]++;
             }

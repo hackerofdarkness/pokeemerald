@@ -287,7 +287,7 @@ MysteryEventScript_AlteringCave_: @ 86756FD
 	end
 
 sText_MysteryGiftAlteringCave::
-	.string "Thank you for using the MYSTERY\nGIFT System.\pThere appears to be a rumor about\nrare POKéMON sightings.\pThe sightings reportedly came from\nthe ALTERING CAVE on ROUTE 103.\pPerhaps it would be worthwhile for\nyou to investigate this rumor.$"
+	.string "Thank you for using the MYSTERY\nGIFT System.\pThere appears to be a rumor about\nrare POKéMON sightings.\pThe sightings reportedly came from\nthe ALTERING CAVE on Route 03.\pPerhaps it would be worthwhile for\nyou to investigate this rumor.$"
 
 MysteryEventScript_OldSeaMap:: @ 86757F4
 	setvaddress MysteryEventScript_OldSeaMap

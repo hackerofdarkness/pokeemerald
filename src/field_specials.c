@@ -1,4 +1,5 @@
 #include "global.h"
+#include "main.h"
 #include "battle.h"
 #include "battle_tower.h"
 #include "cable_club.h"
@@ -12,6 +13,7 @@
 #include "field_effect.h"
 #include "field_message_box.h"
 #include "field_player_avatar.h"
+#include "field_region_map.h"
 #include "field_screen.h"
 #include "field_specials.h"
 #include "field_weather.h"
@@ -19,7 +21,6 @@
 #include "item_icon.h"
 #include "link.h"
 #include "list_menu.h"
-#include "main.h"
 #include "malloc.h"
 #include "match_call.h"
 #include "menu.h"
@@ -45,7 +46,6 @@
 #include "wallclock.h"
 #include "window.h"
 #include "constants/event_objects.h"
-#include "constants/field_effects.h"
 #include "constants/items.h"
 #include "constants/maps.h"
 #include "constants/songs.h"
@@ -80,7 +80,6 @@ extern const u16 gEventObjectPalette34[];
 
 extern void LoadPalette(const void *src, u32 offset, u16 size); // incorrect signature, needed to match
 extern void BlendPalettes(u32, u8, u16);
-extern void FieldInitRegionMap(MainCallback callback);
 
 void UpdateMovedLilycoveFanClubMembers(void);
 void sub_813BF60(void);
@@ -596,7 +595,7 @@ static void LoadLinkPartnerEventObjectSpritePalette(u8 graphicsId, u8 localEvent
         graphicsId == EVENT_OBJ_GFX_RIVAL_MAY_NORMAL)
     {
         u8 obj = GetEventObjectIdByLocalIdAndMap(localEventId, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
-        if (obj != EVENT_OBJECTS_COUNT)
+        if (obj != NUM_EVENT_OBJECTS)
         {
             u8 spriteId = gEventObjects[obj].spriteId;
             struct Sprite *sprite = &gSprites[spriteId];
@@ -1514,7 +1513,7 @@ bool8 FoundBlackGlasses(void)
 
 void SetRoute119Weather(void)
 {
-    if (is_map_type_1_2_3_5_or_6(GetLastUsedWarpMapType()) != TRUE)
+    if (is_map_type_1_2_3_5_or_6(get_map_light_from_warp0()) != TRUE)
     {
         SetSav1Weather(20);
     }
@@ -1522,7 +1521,7 @@ void SetRoute119Weather(void)
 
 void SetRoute123Weather(void)
 {
-    if (is_map_type_1_2_3_5_or_6(GetLastUsedWarpMapType()) != TRUE)
+    if (is_map_type_1_2_3_5_or_6(get_map_light_from_warp0()) != TRUE)
     {
         SetSav1Weather(21);
     }
@@ -2159,73 +2158,73 @@ void sub_8139F20(void)
         case 1:
         case 2:
         case 3:
-            if (gSaveBlock2Ptr->frontier.towerWinStreaks[var][0] >= gSaveBlock2Ptr->frontier.towerWinStreaks[var][1])
+            if (gSaveBlock2Ptr->frontier.winStreaks[var][0] >= gSaveBlock2Ptr->frontier.winStreaks[var][1])
             {
-                unk = gSaveBlock2Ptr->frontier.towerWinStreaks[var][0];
+                unk = gSaveBlock2Ptr->frontier.winStreaks[var][0];
             }
             else
             {
-                unk = gSaveBlock2Ptr->frontier.towerWinStreaks[var][1];
+                unk = gSaveBlock2Ptr->frontier.winStreaks[var][1];
             }
             break;
         case 4:
-            if (gSaveBlock2Ptr->frontier.domeWinStreaks[0][0] >= gSaveBlock2Ptr->frontier.domeWinStreaks[0][1])
+            if (gSaveBlock2Ptr->frontier.field_D0C[0][0] >= gSaveBlock2Ptr->frontier.field_D0C[0][1])
             {
-                unk = gSaveBlock2Ptr->frontier.domeWinStreaks[0][0];
+                unk = gSaveBlock2Ptr->frontier.field_D0C[0][0];
             }
             else
             {
-                unk = gSaveBlock2Ptr->frontier.domeWinStreaks[0][1];
+                unk = gSaveBlock2Ptr->frontier.field_D0C[0][1];
             }
             break;
         case 5:
-            if (gSaveBlock2Ptr->frontier.factoryWinStreaks[0][0] >= gSaveBlock2Ptr->frontier.factoryWinStreaks[0][1])
+            if (gSaveBlock2Ptr->frontier.field_DE2[0][0] >= gSaveBlock2Ptr->frontier.field_DE2[0][1])
             {
-                unk = gSaveBlock2Ptr->frontier.factoryWinStreaks[0][0];
+                unk = gSaveBlock2Ptr->frontier.field_DE2[0][0];
             }
             else
             {
-                unk = gSaveBlock2Ptr->frontier.factoryWinStreaks[0][1];
+                unk = gSaveBlock2Ptr->frontier.field_DE2[0][1];
             }
             break;
         case 6:
-            if (gSaveBlock2Ptr->frontier.palaceWinStreaks[0][0] >= gSaveBlock2Ptr->frontier.palaceWinStreaks[0][1])
+            if (gSaveBlock2Ptr->frontier.field_DC8[0][0] >= gSaveBlock2Ptr->frontier.field_DC8[0][1])
             {
-                unk = gSaveBlock2Ptr->frontier.palaceWinStreaks[0][0];
+                unk = gSaveBlock2Ptr->frontier.field_DC8[0][0];
             }
             else
             {
-                unk = gSaveBlock2Ptr->frontier.palaceWinStreaks[0][1];
+                unk = gSaveBlock2Ptr->frontier.field_DC8[0][1];
             }
             break;
         case 7:
-            if (gSaveBlock2Ptr->frontier.arenaWinStreaks[0] >= gSaveBlock2Ptr->frontier.arenaWinStreaks[1])
+            if (gSaveBlock2Ptr->frontier.field_DDA[0] >= gSaveBlock2Ptr->frontier.field_DDA[1])
             {
-                unk = gSaveBlock2Ptr->frontier.arenaWinStreaks[0];
+                unk = gSaveBlock2Ptr->frontier.field_DDA[0];
             }
             else
             {
-                unk = gSaveBlock2Ptr->frontier.arenaWinStreaks[1];
+                unk = gSaveBlock2Ptr->frontier.field_DDA[1];
             }
             break;
         case 8:
-            if (gSaveBlock2Ptr->frontier.pikeWinStreaks[0] >= gSaveBlock2Ptr->frontier.pikeWinStreaks[1])
+            if (gSaveBlock2Ptr->frontier.field_E04[0] >= gSaveBlock2Ptr->frontier.field_E04[1])
             {
-                unk = gSaveBlock2Ptr->frontier.pikeWinStreaks[0];
+                unk = gSaveBlock2Ptr->frontier.field_E04[0];
             }
             else
             {
-                unk = gSaveBlock2Ptr->frontier.pikeWinStreaks[1];
+                unk = gSaveBlock2Ptr->frontier.field_E04[1];
             }
             break;
         case 9:
-            if (gSaveBlock2Ptr->frontier.pyramidWinStreaks[0] >= gSaveBlock2Ptr->frontier.pyramidWinStreaks[1])
+            if (gSaveBlock2Ptr->frontier.field_E1A[0] >= gSaveBlock2Ptr->frontier.field_E1A[1])
             {
-                unk = gSaveBlock2Ptr->frontier.pyramidWinStreaks[0];
+                unk = gSaveBlock2Ptr->frontier.field_E1A[0];
             }
             else
             {
-                unk = gSaveBlock2Ptr->frontier.pyramidWinStreaks[1];
+                unk = gSaveBlock2Ptr->frontier.field_E1A[1];
             }
             break;
     }
@@ -2254,7 +2253,7 @@ void sub_813A080(void)
 
     for (i = 0; i < 9; i++)
     {
-        if (gUnknown_085B2CDC[i] > gSaveBlock2Ptr->frontier.towerWinStreaks[battleMode][lvlMode])
+        if (gUnknown_085B2CDC[i] > gSaveBlock2Ptr->frontier.winStreaks[battleMode][lvlMode])
         {
             gSpecialVar_0x8005 = 4;
             gSpecialVar_0x8006 = i + 5;
@@ -2998,7 +2997,7 @@ void sub_813A8FC(void)
 {
     u8 string[32];
     u32 x;
-    StringCopy(ConvertIntToDecimalStringN(string, gSaveBlock2Ptr->frontier.battlePoints, STR_CONV_MODE_RIGHT_ALIGN, 4), gText_BP);
+    StringCopy(ConvertIntToDecimalStringN(string, gSaveBlock2Ptr->frontier.frontierBattlePoints, STR_CONV_MODE_RIGHT_ALIGN, 4), gText_BP);
     x = GetStringRightAlignXOffset(1, string, 48);
     AddTextPrinterParameterized(gUnknown_0203AB6D, 1, string, x, 1, 0, NULL);
 }
@@ -3029,31 +3028,31 @@ void sub_813A988(void)
 
 void sub_813A9A4(void)
 {
-    if (gSaveBlock2Ptr->frontier.battlePoints < gSpecialVar_0x8004)
+    if (gSaveBlock2Ptr->frontier.frontierBattlePoints < gSpecialVar_0x8004)
     {
-        gSaveBlock2Ptr->frontier.battlePoints = 0;
+        gSaveBlock2Ptr->frontier.frontierBattlePoints = 0;
     }
     else
     {
-        gSaveBlock2Ptr->frontier.battlePoints -= gSpecialVar_0x8004;
+        gSaveBlock2Ptr->frontier.frontierBattlePoints -= gSpecialVar_0x8004;
     }
 }
 
 void sub_813A9D0(void)
 {
-    if (gSaveBlock2Ptr->frontier.battlePoints + gSpecialVar_0x8004 > 9999)
+    if (gSaveBlock2Ptr->frontier.frontierBattlePoints + gSpecialVar_0x8004 > 0x270F)
     {
-        gSaveBlock2Ptr->frontier.battlePoints = 9999;
+        gSaveBlock2Ptr->frontier.frontierBattlePoints = 0x270f;
     }
     else
     {
-        gSaveBlock2Ptr->frontier.battlePoints = gSaveBlock2Ptr->frontier.battlePoints + gSpecialVar_0x8004;
+        gSaveBlock2Ptr->frontier.frontierBattlePoints = gSaveBlock2Ptr->frontier.frontierBattlePoints + gSpecialVar_0x8004;
     }
 }
 
 u16 sub_813AA04(void)
 {
-    return gSaveBlock2Ptr->frontier.battlePoints;
+    return gSaveBlock2Ptr->frontier.frontierBattlePoints;
 }
 
 void sub_813AA18(void)

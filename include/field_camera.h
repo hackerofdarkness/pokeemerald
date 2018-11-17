@@ -7,16 +7,16 @@ struct CameraObject
 {
     void (*callback)(struct CameraObject *);
     u32 spriteId;
-    s32 movementSpeedX;
-    s32 movementSpeedY;
+    s32 unk8;
+    s32 unkC;
     s32 x;
     s32 y;
 };
 
 // Exported RAM declarations
-extern struct CameraObject gFieldCamera;
-extern u16 gTotalCameraPixelOffsetX;
-extern u16 gTotalCameraPixelOffsetY;
+extern struct CameraObject gUnknown_03005DD0;
+extern u16 gUnknown_03005DEC;
+extern u16 gUnknown_03005DE8;
 
 // Exported ROM declarations
 void DrawWholeMapView(void);

@@ -57,6 +57,10 @@
 #define B_TXT_PARTNER_CLASS 0x32
 #define B_TXT_PARTNER_NAME 0x33
 #define B_TXT_BUFF3 0x34
+#define B_TXT_ATK_TRAINER_NAME 0x35
+#define B_TXT_ATK_TRAINER_CLASS 0x36
+#define B_TXT_ATK_TEAM 0x37
+#define B_TXT_DEF_NAME 0x38
 
 // for B_TXT_BUFF1, B_TXT_BUFF2 and B_TXT_BUFF3
 
@@ -154,7 +158,7 @@
 {                                                               \
     textVar[0] = B_BUFF_PLACEHOLDER_BEGIN;                      \
     textVar[1] = B_BUFF_MOVE;                                   \
-    textVar[2] = move;                                          \
+    textVar[2] = move & 0xFF;                                   \
     textVar[3] = (move & 0xFF00) >> 8;                          \
     textVar[4] = B_BUFF_EOS;                                    \
 }
@@ -210,12 +214,20 @@ struct BattleMsgData
     u8 textBuffs[3][TEXT_BUFF_ARRAY_COUNT];
 };
 
+enum
+{
+    TRAINER_SLIDE_LAST_SWITCHIN,
+    TRAINER_SLIDE_LAST_LOW_HP,
+    TRAINER_SLIDE_FIRST_DOWN,
+};
+
 void BufferStringBattle(u16 stringID);
 u32 BattleStringExpandPlaceholdersToDisplayedString(const u8* src);
 u32 BattleStringExpandPlaceholders(const u8* src, u8* dst);
 void BattlePutTextOnWindow(const u8* text, u8 arg1);
 void SetPpNumbersPaletteInMoveSelection(void);
 u8 GetCurrentPpToMaxPpState(u8 currentPp, u8 maxPp);
+bool32 ShouldDoTrainerSlide(u32 battlerId, u32 trainerId, u32 which);
 
 extern struct BattleMsgData *gBattleMsgDataPtr;
 
@@ -247,6 +259,11 @@ extern const u8 gText_BattleSwitchWhich2[];
 extern const u8 gText_BattleSwitchWhich3[];
 extern const u8 gText_BattleSwitchWhich4[];
 extern const u8 gText_BattleSwitchWhich5[];
+extern const u8 gText_Attack[];
+extern const u8 gText_Defense[];
+extern const u8 gText_SpAtk[];
+extern const u8 gText_SpDef[];
+extern const u8 gText_Speed[];
 extern const u8 gText_SafariBalls[];
 extern const u8 gText_SafariBallLeft[];
 extern const u8 gText_Sleep[];

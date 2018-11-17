@@ -52,7 +52,6 @@
 #include "tv.h"
 #include "scanline_effect.h"
 #include "wild_encounter.h"
-#include "frontier_util.h"
 #include "constants/abilities.h"
 #include "constants/map_types.h"
 #include "constants/maps.h"
@@ -137,6 +136,7 @@ extern void sub_8087D74(void);
 extern void battle_pyramid_map_load_related(u8);
 extern void sub_80B00E8(u8);
 extern void sub_80E9238(u8);
+extern void sub_81A3908(void);
 extern void sub_81AA2F8(void);
 extern void sub_8195E10(void);
 extern void sub_80EDB44(void);
@@ -585,7 +585,7 @@ void set_warp2_warp3_to_neg_1(void)
     gFixedHoleWarp = sDummyWarpData;
 }
 
-static void SetWarpData(struct WarpData *warp, s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y)
+void SetWarpData(struct WarpData *warp, s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y)
 {
     warp->mapGroup = mapGroup;
     warp->mapNum = mapNum;
@@ -594,7 +594,7 @@ static void SetWarpData(struct WarpData *warp, s8 mapGroup, s8 mapNum, s8 warpId
     warp->y = y;
 }
 
-static bool32 IsDummyWarp(struct WarpData *warp)
+bool32 IsDummyWarp(struct WarpData *warp)
 {
     if (warp->mapGroup != -1)
         return FALSE;
@@ -620,7 +620,7 @@ struct MapHeader const *const GetDestinationWarpMapHeader(void)
     return Overworld_GetMapHeaderByGroupAndId(sWarpDestination.mapGroup, sWarpDestination.mapNum);
 }
 
-static void LoadCurrentMapData(void)
+void LoadCurrentMapData(void)
 {
     sLastMapSectionId = gMapHeader.regionMapSectionId;
     gMapHeader = *Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
@@ -628,13 +628,13 @@ static void LoadCurrentMapData(void)
     gMapHeader.mapLayout = GetMapLayout();
 }
 
-static void LoadSaveblockMapHeader(void)
+void LoadSaveblockMapHeader(void)
 {
     gMapHeader = *Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
     gMapHeader.mapLayout = GetMapLayout();
 }
 
-static void SetPlayerCoordsFromWarp(void)
+void SetPlayerCoordsFromWarp(void)
 {
     if (gSaveBlock1Ptr->location.warpId >= 0 && gSaveBlock1Ptr->location.warpId < gMapHeader.events->warpCount)
     {
@@ -729,7 +729,7 @@ void SetFixedDiveWarp(s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y)
     SetWarpData(&gFixedDiveWarp, mapGroup, mapNum, warpId, x, y);
 }
 
-static void SetFixedDiveWarpAsDestination(void)
+void SetFixedDiveWarpAsDestination(void)
 {
     sWarpDestination = gFixedDiveWarp;
 }
@@ -785,7 +785,7 @@ const struct MapConnection *GetMapConnection(u8 dir)
     return NULL;
 }
 
-static bool8 SetDiveWarp(u8 dir, u16 x, u16 y)
+bool8 SetDiveWarp(u8 dir, u16 x, u16 y)
 {
     const struct MapConnection *connection = GetMapConnection(dir);
 
@@ -905,8 +905,8 @@ static void mli0_load_map(u32 a1)
 
 void ResetInitialPlayerAvatarState(void)
 {
-    gInitialPlayerAvatarState.direction = DIR_SOUTH;
-    gInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_ON_FOOT;
+    gInitialPlayerAvatarState.direction = 1;
+    gInitialPlayerAvatarState.transitionFlags = 1;
 }
 
 void StoreInitialPlayerAvatarState(void)
@@ -914,15 +914,15 @@ void StoreInitialPlayerAvatarState(void)
     gInitialPlayerAvatarState.direction = GetPlayerFacingDirection();
 
     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE))
-        gInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_MACH_BIKE;
+        gInitialPlayerAvatarState.transitionFlags = 2;
     else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_ACRO_BIKE))
-        gInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_ACRO_BIKE;
+        gInitialPlayerAvatarState.transitionFlags = 4;
     else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-        gInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_SURFING;
+        gInitialPlayerAvatarState.transitionFlags = 8;
     else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_UNDERWATER))
-        gInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_UNDERWATER;
+        gInitialPlayerAvatarState.transitionFlags = 16;
     else
-        gInitialPlayerAvatarState.transitionFlags = PLAYER_AVATAR_FLAG_ON_FOOT;
+        gInitialPlayerAvatarState.transitionFlags = 1;
 }
 
 static struct InitialPlayerAvatarState *GetInitialPlayerAvatarState(void)
@@ -940,44 +940,44 @@ static struct InitialPlayerAvatarState *GetInitialPlayerAvatarState(void)
 static u8 GetAdjustedInitialTransitionFlags(struct InitialPlayerAvatarState *playerStruct, u16 metatileBehavior, u8 mapType)
 {
     if (mapType != MAP_TYPE_INDOOR && FlagGet(FLAG_SYS_CRUISE_MODE))
-        return PLAYER_AVATAR_FLAG_ON_FOOT;
+        return 1;
     else if (mapType == MAP_TYPE_UNDERWATER)
-        return PLAYER_AVATAR_FLAG_UNDERWATER;
+        return 16;
     else if (MetatileBehavior_IsSurfableWaterOrUnderwater(metatileBehavior) == TRUE)
-        return PLAYER_AVATAR_FLAG_SURFING;
+        return 8;
     else if (Overworld_IsBikingAllowed() != TRUE)
-        return PLAYER_AVATAR_FLAG_ON_FOOT;
-    else if (playerStruct->transitionFlags == PLAYER_AVATAR_FLAG_MACH_BIKE)
-        return PLAYER_AVATAR_FLAG_MACH_BIKE;
-    else if (playerStruct->transitionFlags != PLAYER_AVATAR_FLAG_ACRO_BIKE)
-        return PLAYER_AVATAR_FLAG_ON_FOOT;
+        return 1;
+    else if (playerStruct->transitionFlags == 2)
+        return 2;
+    else if (playerStruct->transitionFlags != 4)
+        return 1;
     else
-        return PLAYER_AVATAR_FLAG_ACRO_BIKE;
+        return 4;
 }
 
 static u8 GetAdjustedInitialDirection(struct InitialPlayerAvatarState *playerStruct, u8 transitionFlags, u16 metatileBehavior, u8 mapType)
 {
     if (FlagGet(FLAG_SYS_CRUISE_MODE) && mapType == MAP_TYPE_6)
-        return DIR_EAST;
+        return 4;
     else if (MetatileBehavior_IsDeepSouthWarp(metatileBehavior) == TRUE)
-        return DIR_NORTH;
+        return 2;
     else if (MetatileBehavior_IsNonAnimDoor(metatileBehavior) == TRUE || MetatileBehavior_IsDoor(metatileBehavior) == TRUE)
-        return DIR_SOUTH;
+        return 1;
     else if (MetatileBehavior_IsSouthArrowWarp(metatileBehavior) == TRUE)
-        return DIR_NORTH;
+        return 2;
     else if (MetatileBehavior_IsNorthArrowWarp(metatileBehavior) == TRUE)
-        return DIR_SOUTH;
+        return 1;
     else if (MetatileBehavior_IsWestArrowWarp(metatileBehavior) == TRUE)
-        return DIR_EAST;
+        return 4;
     else if (MetatileBehavior_IsEastArrowWarp(metatileBehavior) == TRUE)
-        return DIR_WEST;
-    else if ((playerStruct->transitionFlags == PLAYER_AVATAR_FLAG_UNDERWATER  && transitionFlags == PLAYER_AVATAR_FLAG_SURFING)
-     || (playerStruct->transitionFlags == PLAYER_AVATAR_FLAG_SURFING && transitionFlags == PLAYER_AVATAR_FLAG_UNDERWATER ))
+        return 3;
+    else if ((playerStruct->transitionFlags == 16 && transitionFlags == 8)
+     || (playerStruct->transitionFlags == 8 && transitionFlags == 16))
         return playerStruct->direction;
     else if (MetatileBehavior_IsLadder(metatileBehavior) == TRUE)
         return playerStruct->direction;
     else
-        return DIR_SOUTH;
+        return 1;
 }
 
 static u16 GetCenterScreenMetatileBehavior(void)
@@ -1357,7 +1357,7 @@ u8 Overworld_GetMapTypeOfSaveblockLocation(void)
     return GetMapTypeByWarpData(&gSaveBlock1Ptr->location);
 }
 
-u8 GetLastUsedWarpMapType(void)
+u8 get_map_light_from_warp0(void)
 {
     return GetMapTypeByWarpData(&gLastUsedWarp);
 }
@@ -1458,7 +1458,7 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
     FieldGetPlayerInput(&inputStruct, newKeys, heldKeys);
     if (!ScriptContext2_IsEnabled())
     {
-        if (ProcessPlayerFieldInput(&inputStruct) == 1)
+        if (sub_809C014(&inputStruct) == 1)
         {
             ScriptContext2_Enable();
             HideMapNamePopUpWindow();
@@ -1552,7 +1552,6 @@ void CB2_NewGame(void)
     PlayTimeCounter_Start();
     ScriptContext1_Init();
     ScriptContext2_Disable();
-    gFieldCallback = ExecuteTruckSequence;
     gFieldCallback2 = NULL;
     do_load_map_stuff_loop(&gMain.state);
     SetFieldVBlankCallback();
@@ -2166,9 +2165,9 @@ static void sub_8086988(u32 a1)
 
 static void sub_80869DC(void)
 {
-    gTotalCameraPixelOffsetX = 0;
-    gTotalCameraPixelOffsetY = 0;
-    ResetEventObjects();
+    gUnknown_03005DEC = 0;
+    gUnknown_03005DE8 = 0;
+    sub_808D438();
     TrySpawnEventObjects(0, 0);
     mapheader_run_first_tag4_script_list_match();
 }
@@ -2178,9 +2177,9 @@ static void mli4_mapscripts_and_other(void)
     s16 x, y;
     struct InitialPlayerAvatarState *player;
 
-    gTotalCameraPixelOffsetX = 0;
-    gTotalCameraPixelOffsetY = 0;
-    ResetEventObjects();
+    gUnknown_03005DEC = 0;
+    gUnknown_03005DE8 = 0;
+    sub_808D438();
     sav1_camera_get_focus_coords(&x, &y);
     player = GetInitialPlayerAvatarState();
     InitPlayerAvatar(x, y, player->direction, gSaveBlock2Ptr->playerGender);
@@ -3144,7 +3143,7 @@ static void CreateLinkPlayerSprite(u8 linkPlayerId, u8 gameVersion)
             eventObj->spriteId = AddPseudoEventObject(GetRSAvatarGraphicsIdByGender(eventObj->singleMovementActive), SpriteCB_LinkPlayer, 0, 0, 0);
             break;
         case VERSION_EMERALD:
-            eventObj->spriteId = AddPseudoEventObject(GetRivalAvatarGraphicsIdByStateIdAndGender(PLAYER_AVATAR_STATE_NORMAL, eventObj->singleMovementActive), SpriteCB_LinkPlayer, 0, 0, 0);
+            eventObj->spriteId = AddPseudoEventObject(GetRivalAvatarGraphicsIdByStateIdAndGender(0, eventObj->singleMovementActive), SpriteCB_LinkPlayer, 0, 0, 0);
             break;
         }
 

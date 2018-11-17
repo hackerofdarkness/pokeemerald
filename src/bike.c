@@ -3,13 +3,13 @@
 #include "event_object_movement.h"
 #include "field_player_avatar.h"
 #include "fieldmap.h"
+#include "constants/flags.h"
 #include "global.fieldmap.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
-#include "sound.h"
-#include "constants/flags.h"
-#include "constants/map_types.h"
 #include "constants/songs.h"
+#include "sound.h"
+#include "constants/map_types.h"
 
 extern bool8 gBikeCyclingChallenge;
 extern u8 gBikeCollisions;
@@ -908,10 +908,10 @@ static u8 Bike_CheckCollisionTryAdvanceCollisionCount(struct EventObject *eventO
 
 bool8 RS_IsRunningDisallowed(u8 tile)
 {
-    if (IsRunningDisallowedByMetatile(tile) != FALSE || gMapHeader.mapType == MAP_TYPE_INDOOR)
-        return TRUE;
-    else
-        return FALSE;
+		if (IsRunningDisallowedByMetatile(tile))
+			return TRUE;
+		else
+			return FALSE;
 }
 
 static bool8 IsRunningDisallowedByMetatile(u8 tile)
