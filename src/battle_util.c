@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_controllers.h"
 #include "battle_interface.h"
 #include "constants/battle_script_commands.h"
 #include "constants/abilities.h"
@@ -19,7 +20,6 @@
 #include "battle_message.h"
 #include "constants/battle_string_ids.h"
 #include "battle_ai_script_commands.h"
-#include "battle_controllers.h"
 #include "event_data.h"
 #include "link.h"
 #include "berry.h"
@@ -148,6 +148,7 @@ static const u8 sHoldEffectToType[][2] =
 
 // percent in UQ_4_12 format
 static const u16 sPercentToModifier[] =
+
 {
     UQ_4_12(0.00), // 0
     UQ_4_12(0.01), // 1
@@ -5016,7 +5017,7 @@ static u32 CalcMoveBasePowerAfterModifiers(u16 move, u8 battlerAtk, u8 battlerDe
     return ApplyModifier(modifier, basePower);
 }
 
-static u32 CalcAttackStat(u16 move, u8 battlerAtk, u8 battlerDef, u8 moveType, bool32 isCrit)
+u32 CalcAttackStat(u16 move, u8 battlerAtk, u8 battlerDef, u8 moveType, bool32 isCrit)
 {
     u8 atkStage;
     u32 atkStat;
@@ -5025,20 +5026,28 @@ static u32 CalcAttackStat(u16 move, u8 battlerAtk, u8 battlerDef, u8 moveType, b
     if (gBattleMoves[move].effect == EFFECT_FOUL_PLAY)
     {
         if (IS_MOVE_PHYSICAL(move))
+        {
             atkStat = gBattleMons[battlerDef].attack;
+            atkStage = gBattleMons[battlerDef].statStages[STAT_ATK];
+        }
         else
+        {
             atkStat = gBattleMons[battlerDef].spAttack;
-
-        atkStage = gBattleMons[battlerDef].statStages[STAT_ATK];
+            atkStage = gBattleMons[battlerDef].statStages[STAT_SPATK];
+        }
     }
     else
     {
         if (IS_MOVE_PHYSICAL(move))
+        {
             atkStat = gBattleMons[battlerAtk].attack;
+            atkStage = gBattleMons[battlerAtk].statStages[STAT_ATK];
+        }
         else
+        {
             atkStat = gBattleMons[battlerAtk].spAttack;
-
-        atkStage = gBattleMons[battlerAtk].statStages[STAT_SPATK];
+            atkStage = gBattleMons[battlerAtk].statStages[STAT_SPATK];
+        }
     }
 
     // critical hits ignore attack stat's stage drops
@@ -5483,6 +5492,9 @@ static u16 CalcTypeEffectivenessMultiplierInternal(u16 move, u8 moveType, u8 bat
     MulByTypeEffectiveness(&modifier, move, moveType, battlerDef, gBattleMons[battlerDef].type1, atkAbility);
     if (gBattleMons[battlerDef].type2 != gBattleMons[battlerDef].type1)
         MulByTypeEffectiveness(&modifier, move, moveType, battlerDef, gBattleMons[battlerDef].type2, atkAbility);
+    if (gBattleMons[battlerDef].type3 != TYPE_MYSTERY && gBattleMons[battlerDef].type3 != gBattleMons[battlerDef].type2
+        && gBattleMons[battlerDef].type3 != gBattleMons[battlerDef].type1)
+        MulByTypeEffectiveness(&modifier, move, moveType, battlerDef, gBattleMons[battlerDef].type3, atkAbility);
 
     if (moveType == TYPE_GROUND && !IsBattlerGrounded(battlerDef))
     {

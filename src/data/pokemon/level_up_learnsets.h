@@ -5214,10 +5214,10 @@ static const struct LevelUpMove sSceptileLevelUpLearnset[] = {
 };
 
 static const struct LevelUpMove sTorchicLevelUpLearnset[] = {
-    LEVEL_UP_MOVE( 1, MOVE_FLARE_BLITZ),
-    LEVEL_UP_MOVE( 1, MOVE_GASTRO_ACID),
-    LEVEL_UP_MOVE( 5, MOVE_COPYCAT),
-    LEVEL_UP_MOVE(5, MOVE_AURA_SPHERE),
+    LEVEL_UP_MOVE( 1, MOVE_SCRATCH),
+    LEVEL_UP_MOVE( 1, MOVE_GROWL),
+    LEVEL_UP_MOVE( 5, MOVE_EMBER),
+    LEVEL_UP_MOVE(10, MOVE_SAND_ATTACK),
     LEVEL_UP_MOVE(14, MOVE_PECK),
     LEVEL_UP_MOVE(19, MOVE_FIRE_SPIN),
     LEVEL_UP_MOVE(23, MOVE_QUICK_ATTACK),

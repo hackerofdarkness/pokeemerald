@@ -19,6 +19,7 @@
 #include "link.h"
 #include "script.h"
 #include "battle_debug.h"
+#include "battle_pike.h"
 #include "constants/items.h"
 #include "constants/maps.h"
 

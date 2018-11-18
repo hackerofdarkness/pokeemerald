@@ -331,6 +331,26 @@ gBattleScriptsForMoveEffects:: @ 82D86A8
 	.4byte BattleScript_EffectFlowerShield
 	.4byte BattleScript_EffectHitPreventEscape
 	.4byte BattleScript_EffectSpeedSwap
+	.4byte BattleScript_EffectDefenseUp2Hit
+	.4byte BattleScript_EffectRevelationDance
+	.4byte BattleScript_EffectAuroraVeil
+	.4byte BattleScript_EffectThirdType
+	
+BattleScript_EffectThirdType:
+	attackcanceler
+	accuracycheck BattleScript_PrintMoveMissed, ACC_CURR_MOVE
+	attackstring
+	ppreduce
+	trysetthirdtype BS_TARGET, BattleScript_ButItFailed
+	attackanimation
+	waitanimation
+	printstring STRINGID_THIRDTYPEADDED
+	waitmessage 0x40
+	goto BattleScript_MoveEnd
+	
+BattleScript_EffectDefenseUp2Hit:
+	setmoveeffect MOVE_EFFECT_DEF_PLUS_2 | MOVE_EFFECT_AFFECTS_USER
+	goto BattleScript_EffectHit
 	
 BattleScript_EffectFlowerShield:
 	attackcanceler
@@ -1579,6 +1599,7 @@ BattleScript_EffectTwoTypedMove:
 BattleScript_EffectTechnoBlast:
 BattleScript_EffectJudgment:
 BattleScript_EffectFusionCombo:
+BattleScript_EffectRevelationDance:
 	jumpifnotmove MOVE_SURF, BattleScript_HitFromAtkCanceler
 	jumpifnostatus3 BS_TARGET, STATUS3_UNDERWATER, BattleScript_HitFromAtkCanceler
 	orword gHitMarker, HITMARKER_IGNORE_UNDERWATER
@@ -2114,6 +2135,13 @@ BattleScript_ImmunityProtected::
 BattleScript_EffectPayDay::
 	setmoveeffect MOVE_EFFECT_PAYDAY
 	goto BattleScript_EffectHit
+	
+BattleScript_EffectAuroraVeil:
+	attackcanceler
+	attackstring
+	ppreduce
+	setauroraveil BS_ATTACKER
+	goto BattleScript_PrintReflectLightScreenSafeguardString
 
 BattleScript_EffectLightScreen::
 	attackcanceler
@@ -2436,7 +2464,7 @@ BattleScript_EffectParalyze:
 	goto BattleScript_MoveEnd
 
 BattleScript_AlreadyParalyzed:
-	various23 BS_ATTACKER
+	setalreadystatusedmoveattempt BS_ATTACKER
 	pause 0x20
 	printstring STRINGID_PKMNISALREADYPARALYZED
 	waitmessage 0x40

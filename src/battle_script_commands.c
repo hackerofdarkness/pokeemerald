@@ -44,6 +44,8 @@
 #include "overworld.h"
 #include "party_menu.h"
 #include "constants/battle_config.h"
+#include "battle_arena.h"
+#include "battle_pike.h"
 
 extern u16 gBattle_BG1_X;
 extern u16 gBattle_BG1_Y;
@@ -4478,6 +4480,7 @@ static void atk4D_switchindataupdate(void)
 
     gBattleMons[gActiveBattler].type1 = gBaseStats[gBattleMons[gActiveBattler].species].type1;
     gBattleMons[gActiveBattler].type2 = gBaseStats[gBattleMons[gActiveBattler].species].type2;
+    gBattleMons[gActiveBattler].type3 = TYPE_MYSTERY;
     gBattleMons[gActiveBattler].ability = GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].altAbility);
 
     // check knocked off item
@@ -7109,6 +7112,39 @@ static void atk76_various(void)
             return;
         }
         break;
+    case VARIOUS_SET_AURORA_VEIL:
+        if (gSideStatuses[GET_BATTLER_SIDE(gActiveBattler)] & SIDE_STATUS_AURORA_VEIL)
+        {
+            gMoveResultFlags |= MOVE_RESULT_MISSED;
+            gBattleCommunication[MULTISTRING_CHOOSER] = 0;
+        }
+        else
+        {
+            gSideStatuses[GET_BATTLER_SIDE(gActiveBattler)] |= SIDE_STATUS_AURORA_VEIL;
+            if (GetBattlerHoldEffect(gActiveBattler, TRUE) == HOLD_EFFECT_LIGHT_CLAY)
+                gSideTimers[GET_BATTLER_SIDE(gActiveBattler)].auroraVeilTimer = 8;
+            else
+                gSideTimers[GET_BATTLER_SIDE(gActiveBattler)].auroraVeilTimer = 5;
+            gSideTimers[GET_BATTLER_SIDE(gActiveBattler)].auroraVeilBattlerId = gActiveBattler;
+
+            if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE && CountAliveMonsInBattle(BATTLE_ALIVE_ATK_SIDE) == 2)
+                gBattleCommunication[MULTISTRING_CHOOSER] = 5;
+            else
+                gBattleCommunication[MULTISTRING_CHOOSER] = 5;
+        }
+        break;
+    case VARIOUS_TRY_THIRD_TYPE:
+        if (IS_BATTLER_OF_TYPE(gActiveBattler, gBattleMoves[gCurrentMove].argument))
+        {
+            gBattlescriptCurrInstr = T1_READ_PTR(gBattlescriptCurrInstr + 3);
+        }
+        else
+        {
+            gBattleMons[gActiveBattler].type3 = gBattleMoves[gCurrentMove].argument;
+            PREPARE_TYPE_BUFFER(gBattleTextBuff1, gBattleMoves[gCurrentMove].argument);
+            gBattlescriptCurrInstr += 7;
+        }
+        return;
     }
 
     gBattlescriptCurrInstr += 3;
@@ -7118,7 +7154,7 @@ static void atk77_setprotectlike(void) // protect and endure
 {
     bool32 notLastTurn = TRUE;
 
-    if (gBattleMoves[gLastResultingMoves[gBattlerAttacker]].flags & FLAG_PROTECTION_MOVE)
+    if (!(gBattleMoves[gLastResultingMoves[gBattlerAttacker]].flags & FLAG_PROTECTION_MOVE))
         gDisableStructs[gBattlerAttacker].protectUses = 0;
 
     if (gCurrentTurnActionNumber == (gBattlersCount - 1))
@@ -7331,7 +7367,10 @@ static void atk7E_setreflect(void)
     else
     {
         gSideStatuses[GET_BATTLER_SIDE(gBattlerAttacker)] |= SIDE_STATUS_REFLECT;
-        gSideTimers[GET_BATTLER_SIDE(gBattlerAttacker)].reflectTimer = 5;
+        if (GetBattlerHoldEffect(gBattlerAttacker, TRUE) == HOLD_EFFECT_LIGHT_CLAY)
+            gSideTimers[GET_BATTLER_SIDE(gBattlerAttacker)].reflectTimer = 8;
+        else
+            gSideTimers[GET_BATTLER_SIDE(gBattlerAttacker)].reflectTimer = 5;
         gSideTimers[GET_BATTLER_SIDE(gBattlerAttacker)].reflectBattlerId = gBattlerAttacker;
 
         if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE && CountAliveMonsInBattle(BATTLE_ALIVE_ATK_SIDE) == 2)
@@ -8026,7 +8065,8 @@ static void atk90_tryconversiontypechange(void) // randomly changes user's type 
                 moveType = TYPE_NORMAL;
         }
         if (moveType != gBattleMons[gBattlerAttacker].type1
-            && moveType != gBattleMons[gBattlerAttacker].type2)
+            && moveType != gBattleMons[gBattlerAttacker].type2
+            && moveType != gBattleMons[gBattlerAttacker].type3)
         {
             break;
         }
@@ -8053,7 +8093,7 @@ static void atk90_tryconversiontypechange(void) // randomly changes user's type 
                     moveType = TYPE_NORMAL;
             }
         }
-        while (moveType == gBattleMons[gBattlerAttacker].type1 || moveType == gBattleMons[gBattlerAttacker].type2);
+        while (moveType == gBattleMons[gBattlerAttacker].type1 || moveType == gBattleMons[gBattlerAttacker].type2 || moveType == gBattleMons[gBattlerAttacker].type3);
 
         SET_BATTLER_TYPE(gBattlerAttacker, moveType);
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, moveType);
@@ -8090,7 +8130,10 @@ static void atk92_setlightscreen(void)
     else
     {
         gSideStatuses[GET_BATTLER_SIDE(gBattlerAttacker)] |= SIDE_STATUS_LIGHTSCREEN;
-        gSideTimers[GET_BATTLER_SIDE(gBattlerAttacker)].lightscreenTimer = 5;
+        if (GetBattlerHoldEffect(gBattlerAttacker, TRUE) == HOLD_EFFECT_LIGHT_CLAY)
+            gSideTimers[GET_BATTLER_SIDE(gBattlerAttacker)].lightscreenTimer = 8;
+        else
+            gSideTimers[GET_BATTLER_SIDE(gBattlerAttacker)].lightscreenTimer = 5;
         gSideTimers[GET_BATTLER_SIDE(gBattlerAttacker)].lightscreenBattlerId = gBattlerAttacker;
 
         if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE && CountAliveMonsInBattle(BATTLE_ALIVE_ATK_SIDE) == 2)

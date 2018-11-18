@@ -2282,7 +2282,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.target = MOVE_TARGET_SELECTED,
 		.priority = 0,
 		.flags = FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED | FLAG_SHEER_FORCE_BOOST,
-		.split = SPLIT_PHYSICAL,
+		.split = SPLIT_SPECIAL,
 	},
 	{ // MOVE_OCTAZOOKA
 		.effect = EFFECT_ACCURACY_DOWN_HIT,
@@ -4429,7 +4429,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.pp = 10,
 		.secondaryEffectChance = 0,
 		.target = MOVE_TARGET_DEPENDS,
-		.priority = -3,
+		.priority = 0,
 		.flags = 0,
 		.split = SPLIT_PHYSICAL,
 	},
@@ -6817,7 +6817,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.split = SPLIT_PHYSICAL,
 	},
 	{ // MOVE_TRICK_OR_TREAT
-		.effect = EFFECT_PLACEHOLDER, // Needs a custom move effect
+		.effect = EFFECT_THIRD_TYPE,
 		.power = 0,
 		.type = TYPE_GHOST,
 		.accuracy = 100,
@@ -6827,6 +6827,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.priority = 0,
 		.flags = FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED,
 		.split = SPLIT_STATUS,
+		.argument = TYPE_GHOST,
 	},
 	{ // MOVE_NOBLE_ROAR
 		.effect = EFFECT_NOBLE_ROAR,
@@ -6865,7 +6866,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.split = SPLIT_SPECIAL,
 	},
 	{ // MOVE_FOREST_S_CURSE
-		.effect = EFFECT_PLACEHOLDER, // Needs a custom move effect
+		.effect = EFFECT_THIRD_TYPE,
 		.power = 0,
 		.type = TYPE_GRASS,
 		.accuracy = 100,
@@ -6875,6 +6876,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.priority = 0,
 		.flags = FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED,
 		.split = SPLIT_STATUS,
+		.argument = TYPE_GRASS,
 	},
 	{ // MOVE_PETAL_BLIZZARD
 		.effect = EFFECT_HIT,
@@ -7106,7 +7108,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.split = SPLIT_STATUS,
 	},
 	{ // MOVE_DIAMOND_STORM
-		.effect = EFFECT_PLACEHOLDER, // Needs a custom move effect
+		.effect = EFFECT_DEFENSE_UP2_HIT,
 		.power = 100,
 		.type = TYPE_ROCK,
 		.accuracy = 95,
@@ -7144,6 +7146,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 	{ // MOVE_WATER_SHURIKEN
 		.effect = EFFECT_MULTI_HIT,
 		.power = 20,
+		.power = 15,
 		.type = TYPE_WATER,
 		.accuracy = 100,
 		.pp = 20,
@@ -7383,7 +7386,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.argument = 75, // restores 75% HP instead of 50% HP
 	},
 	{ // MOVE_THOUSAND_ARROWS
-		.effect = EFFECT_PLACEHOLDER, // Needs a custom move effect
+		.effect = EFFECT_SMACK_DOWN,
 		.power = 90,
 		.type = TYPE_GROUND,
 		.accuracy = 100,
@@ -7455,7 +7458,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.split = SPLIT_PHYSICAL,
 	},
 	{ // MOVE_DRAGON_ASCENT
-		.effect = EFFECT_PLACEHOLDER, // Needs a custom move effect
+		.effect = EFFECT_CLOSE_COMBAT,
 		.power = 120,
 		.type = TYPE_FLYING,
 		.accuracy = 100,
@@ -7803,7 +7806,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.split = SPLIT_STATUS,
 	},
 	{ // MOVE_REVELATION_DANCE
-		.effect = EFFECT_PLACEHOLDER,
+		.effect = EFFECT_REVELATION_DANCE,
 		.power = 90,
 		.type = TYPE_NORMAL,
 		.accuracy = 100,
@@ -7812,7 +7815,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.target = MOVE_TARGET_SELECTED,
 		.priority = 0,
 		.flags = FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED | FLAG_KINGSROCK_AFFECTED,
-		.split = SPLIT_STATUS,
+		.split = SPLIT_SPECIAL,
 	},
 	{ // MOVE_CORE_ENFORCER
 		.effect = EFFECT_PLACEHOLDER,
@@ -7899,7 +7902,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 		.split = SPLIT_PHYSICAL,
 	},
 	{ // MOVE_AURORA_VEIL
-		.effect = EFFECT_PLACEHOLDER,
+		.effect = EFFECT_AURORA_VEIL,
 		.power = 0,
 		.type = TYPE_ICE,
 		.accuracy = 0,

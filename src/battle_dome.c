@@ -5585,9 +5585,9 @@ static u16 GetWinningMove(s32 winnerTournamentId, s32 loserTournamentId, u8 roun
                 do
                 {
                     personality = Random32();
-                } while (gFacilityTrainerMons[gSaveBlock2Ptr->frontier.domeMonId[loserTournamentId][k]].nature != GetNatureFromPersonality(personality));
+                } while (gFacilityTrainerMons[gSaveBlock2Ptr->frontier.domeMonIds[loserTournamentId][k]].nature != GetNatureFromPersonality(personality));
 
-                targetSpecies = gFacilityTrainerMons[gSaveBlock2Ptr->frontier.domeMonId[loserTournamentId][k]].species;
+                targetSpecies = gFacilityTrainerMons[gSaveBlock2Ptr->frontier.domeMonIds[loserTournamentId][k]].species;
                 if (personality & 1)
                     targetAbility = gBaseStats[targetSpecies].ability2;
                 else

@@ -568,10 +568,12 @@ struct BattleStruct
     struct BattleTv tv;
     u8 notSureWhatFieldLol[0x28];
     u8 AI_monToSwitchIntoId[MAX_BATTLERS_COUNT];
-    u8 field_298[8];
-    u8 field_2A0;
-    u8 field_2A1;
-    u8 field_2A2;
+    s8 arenaMindPoints[2];
+    s8 arenaSkillPoints[2];
+    u16 arenaStartHp[2];
+    u8 arenaLostPlayerMons; // Bits for party member, lost as in referee's decision, not by fainting.
+    u8 arenaLostOpponentMons;
+    u8 alreadyStatusedMoveAttempt; // As bits for battlers; For example when using Thunder Wave on an already paralyzed pokemon.
     u8 debugBattler;
     u8 magnitudeBasePower;
     u8 presentBasePower;
@@ -601,11 +603,12 @@ struct BattleStruct
 #define BATTLER_MAX_HP(battlerId)(gBattleMons[battlerId].hp == gBattleMons[battlerId].maxHP)
 #define TARGET_TURN_DAMAGED ((gSpecialStatuses[gBattlerTarget].physicalDmg != 0 || gSpecialStatuses[gBattlerTarget].specialDmg != 0))
 
-#define IS_BATTLER_OF_TYPE(battlerId, type)((gBattleMons[battlerId].type1 == type || gBattleMons[battlerId].type2 == type))
-#define SET_BATTLER_TYPE(battlerId, type)   \
-{                                           \
-    gBattleMons[battlerId].type1 = type;    \
-    gBattleMons[battlerId].type2 = type;    \
+#define IS_BATTLER_OF_TYPE(battlerId, type)((gBattleMons[battlerId].type1 == type || gBattleMons[battlerId].type2 == type || gBattleMons[battlerId].type3 == type))
+#define SET_BATTLER_TYPE(battlerId, type)           \
+{                                                   \
+    gBattleMons[battlerId].type1 = type;            \
+    gBattleMons[battlerId].type2 = type;            \
+    gBattleMons[battlerId].type3 = TYPE_MYSTERY;    \
 }
 
 #define GET_STAT_BUFF_ID(n)((n & 0xF))              // first four bits 0x1, 0x2, 0x4, 0x8

@@ -34,8 +34,9 @@
 #include "battle_message.h"
 #include "sprite.h"
 #include "util.h"
-#include "trig.h"
-#include "battle_ai_script_commands.h"
+#include "window.h"
+#include "constants/abilities.h"
+#include "constants/battle_config.h"
 #include "constants/battle_move_effects.h"
 #include "battle_controllers.h"
 #include "pokedex.h"
@@ -3102,9 +3103,8 @@ static void BattleStartClearSetData(void)
         dataPtr[i] = 0;
 
     gBattleResults.shinyWildMon = IsMonShiny(&gEnemyParty[0]);
-
-    gBattleStruct->field_2A0 = 0;
-    gBattleStruct->field_2A1 = 0;
+    gBattleStruct->arenaLostPlayerMons = 0;
+    gBattleStruct->arenaLostOpponentMons = 0;
 
     gBattleStruct->mega.triggerSpriteId = 0xFF;
     for (i = 0; i < MAX_BATTLERS_COUNT; i++)
@@ -3321,6 +3321,7 @@ void FaintClearSetData(void)
 
     gBattleMons[gActiveBattler].type1 = gBaseStats[gBattleMons[gActiveBattler].species].type1;
     gBattleMons[gActiveBattler].type2 = gBaseStats[gBattleMons[gActiveBattler].species].type2;
+    gBattleMons[gActiveBattler].type3 = TYPE_MYSTERY;
 
     ClearBattlerMoveHistory(gActiveBattler);
     ClearBattlerAbilityHistory(gActiveBattler);
@@ -3391,6 +3392,7 @@ static void BattleIntroDrawTrainersOrMonsSprites(void)
 
             gBattleMons[gActiveBattler].type1 = gBaseStats[gBattleMons[gActiveBattler].species].type1;
             gBattleMons[gActiveBattler].type2 = gBaseStats[gBattleMons[gActiveBattler].species].type2;
+            gBattleMons[gActiveBattler].type3 = TYPE_MYSTERY;
             gBattleMons[gActiveBattler].ability = GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].altAbility);
             hpOnSwitchout = &gBattleStruct->hpOnSwitchout[GetBattlerSide(gActiveBattler)];
             *hpOnSwitchout = gBattleMons[gActiveBattler].hp;
@@ -4258,6 +4260,7 @@ static void HandleTurnActionSelectionState(void)
                         moveInfo.species = gBattleMons[gActiveBattler].species;
                         moveInfo.monType1 = gBattleMons[gActiveBattler].type1;
                         moveInfo.monType2 = gBattleMons[gActiveBattler].type2;
+                        moveInfo.monType3 = gBattleMons[gActiveBattler].type3;
 
                         for (i = 0; i < 4; i++)
                         {
@@ -5422,6 +5425,15 @@ void SetTypeBeforeUsingMove(u16 move, u8 battlerAtk)
     {
         // TODO:
     }
+    else if (gBattleMoves[move].effect == EFFECT_REVELATION_DANCE)
+    {
+        if (gBattleMons[battlerAtk].type1 != TYPE_MYSTERY)
+            gBattleStruct->dynamicMoveType = gBattleMons[battlerAtk].type1 | 0x80;
+        else if (gBattleMons[battlerAtk].type2 != TYPE_MYSTERY)
+            gBattleStruct->dynamicMoveType = gBattleMons[battlerAtk].type2 | 0x80;
+        else if (gBattleMons[battlerAtk].type3 != TYPE_MYSTERY)
+            gBattleStruct->dynamicMoveType = gBattleMons[battlerAtk].type3 | 0x80;
+    }
 
     attackerAbility = GetBattlerAbility(battlerAtk);
     GET_MOVE_TYPE(move, moveType);
@@ -5675,6 +5687,9 @@ static void HandleAction_UseMove(void)
 
     if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
         sub_81A56E8(gBattlerAttacker);
+
+    // Set dynamic move type.
+    SetTypeBeforeUsingMove(gChosenMove, gBattlerAttacker);
 
     // Set dynamic move type.
     SetTypeBeforeUsingMove(gChosenMove, gBattlerAttacker);
