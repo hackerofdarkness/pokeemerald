@@ -1152,6 +1152,9 @@ const u32 gStatusPal_Icons[] = INCBIN_U32("graphics/interface/status_icons.gbapa
 const u32 gMoveTypes_Gfx[] = INCBIN_U32("graphics/types/move_types.4bpp.lz");
 const u32 gMoveTypes_Pal[] = INCBIN_U32("graphics/types/move_types.gbapal.lz");
 
+const u32 gLaserGrid_Gfx[] = INCBIN_U32("graphics/interface/laser_grid.4bpp.lz");
+const u32 gLaserGrid_Pal[] = INCBIN_U32("graphics/interface/laser_grid.gbapal.lz");
+
 const u32 gUnknown_08D97BEC[] = INCBIN_U32("graphics/interface/summary_frames.4bpp.lz");
 const u32 gUnknown_08D97CF4[] = INCBIN_U32("graphics/interface/summary_frames.gbapal.lz");
 

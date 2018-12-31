@@ -4030,6 +4030,8 @@ extern const u32 gUnknown_08D97BEC[];
 extern const u32 gUnknown_08D97CF4[];
 extern const u32 gStatusGfx_Icons[];
 extern const u32 gStatusPal_Icons[];
+extern const u32 gLaserGrid_Gfx[];
+extern const u32 gLaserGrid_Pal[];
 
 extern const u32 gBuyMenuFrame_Gfx[];
 extern const u32 gBuyMenuFrame_Tilemap[];

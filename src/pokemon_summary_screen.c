@@ -241,6 +241,7 @@ static void CreateMonMarkingsSprite(struct Pokemon *mon);
 static void RemoveAndCreateMonMarkingsSprite(struct Pokemon *mon);
 static void CreateCaughtBallSprite(struct Pokemon *mon);
 static void CreateSetStatusSprite(void);
+static void CreateLaserGrid(void);
 static void sub_81C4AF8(u8 a);
 static void sub_81C4BE4(struct Sprite *sprite);
 static void sub_81C4C60(u8 a);
@@ -841,7 +842,7 @@ static const struct OamData gOamData_861CFF4 =
     .priority = 1,
     .paletteNum = 0,
     .affineParam = 0,
-};
+};//Summary Frames
 static const union AnimCmd gSpriteAnim_861CFFC[] = {
     ANIMCMD_FRAME(0, 0, FALSE, FALSE),
     ANIMCMD_END
@@ -913,7 +914,7 @@ static const struct SpriteTemplate gUnknown_0861D084 =
     .anims = gSpriteAnimTable_861D04C,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = SpriteCallbackDummy
+    .callback = SpriteCallbackDummy //Summary Frames end
 };
 static const struct OamData sOamData_StatusCondition =
 {
@@ -991,13 +992,89 @@ static const struct SpriteTemplate sSpriteTemplate_StatusCondition =
 };
 static const u16 gUnknown_0861D120[] = INCBIN_U16("graphics/interface/summary_markings.gbapal");
 
+static const struct OamData sOamData_LaserGrid =
+{
+	.y = 0,
+	.affineMode = 0,
+	.objMode = 0,
+	.mosaic = 0,
+	.bpp = 0,
+	.shape = 1,
+	.x = 0,
+	.matrixNum = 0,
+	.size = 1,
+	.tileNum = 0,
+	.priority = 3,
+	.paletteNum = 0,
+	.affineParam = 0,
+};
+static const union AnimCmd sSpriteAnim_LaserGrid1[] = {
+	ANIMCMD_FRAME(0, 0, FALSE, FALSE),
+	ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_LaserGrid2[] = {
+	ANIMCMD_FRAME(8, 0, FALSE, FALSE),
+	ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_LaserGrid3[] = {
+	ANIMCMD_FRAME(16, 0, FALSE, FALSE),
+	ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_LaserGrid4[] = {
+	ANIMCMD_FRAME(24, 0, FALSE, FALSE),
+	ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_LaserGrid5[] = {
+	ANIMCMD_FRAME(32, 0, FALSE, FALSE),
+	ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_LaserGrid6[] = {
+	ANIMCMD_FRAME(40, 0, FALSE, FALSE),
+	ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_LaserGrid7[] = {
+	ANIMCMD_FRAME(48, 0, FALSE, FALSE),
+	ANIMCMD_END
+};
+static const union AnimCmd *const sSpriteAnimTable_LaserGrids[NUMBER_OF_MON_TYPES + CONTEST_CATEGORIES_COUNT] = {
+	sSpriteAnim_LaserGrid1,
+	sSpriteAnim_LaserGrid2,
+	sSpriteAnim_LaserGrid3,
+	sSpriteAnim_LaserGrid4,
+	sSpriteAnim_LaserGrid5,
+	sSpriteAnim_LaserGrid6,
+	sSpriteAnim_LaserGrid7,
+};
+
+static const struct CompressedSpriteSheet gSpriteSheet_LaserGrid =
+{
+	.data = gLaserGrid_Gfx,
+	.size = 0x400,
+	.tag = 30004,
+};
+static const struct CompressedSpritePalette gPalette_LaserGrid =
+{
+	.data = gLaserGrid_Pal,
+	.tag = 30004,
+};
+static const struct SpriteTemplate sSpriteTemplate_LaserGrid =
+{
+	.tileTag = 30004,
+	.paletteTag = 30004,
+	.oam = &sOamData_LaserGrid,
+	.anims = sSpriteAnimTable_LaserGrids,
+	.images = NULL,
+	.affineAnims = gDummySpriteAffineAnimTable,
+	.callback = SpriteCallbackDummy
+};
+
 // code
 void ShowPokemonSummaryScreen(u8 mode, void *mons, u8 monIndex, u8 maxMonIndex, void (*callback)(void))
 {
     pssData = AllocZeroed(sizeof(*pssData));
-    pssData->mode = mode;
-    pssData->monList.mons = mons;
-    pssData->curMonIndex = monIndex;
+    pssData->mode = mode; //Use to determine PSS_MODE
+    pssData->monList.mons = mons; //List of all mons that can be viewed
+    pssData->curMonIndex = monIndex; 
     pssData->maxMonIndex = maxMonIndex;
     pssData->callback = callback;
 
@@ -1186,6 +1263,10 @@ static bool8 SummaryScreen_LoadGraphics(void)
         gPaletteFade.bufferTransferDisabled = 0;
         gMain.state++;
         break;
+	case 25:
+		CreateLaserGrid();
+		gMain.state++;
+		break;
     default:
         SetVBlankCallback(SummaryScreen_VBlank);
         SetMainCallback2(SummaryScreen_MainCB2);
@@ -1274,6 +1355,14 @@ static bool8 SummaryScreen_DecompressGraphics(void)
         LoadCompressedPalette(&gMoveTypes_Pal, 0x1D0, 0x60);
         pssData->unk40F0 = 0;
         return TRUE;
+	case 13:
+		LoadCompressedSpriteSheet(&gSpriteSheet_LaserGrid);
+		pssData->unk40F0++;
+		break;
+	case 14:
+		LoadCompressedSpritePalette(&gPalette_LaserGrid);
+		pssData->unk40F0++;
+		break;
     }
     return FALSE;
 }
@@ -2704,7 +2793,7 @@ static void sub_81C2794(void)
     ClearWindowTilemap(17);
     ClearWindowTilemap(19);
 }
-
+//Gender Icon
 static void sub_81C27DC(struct Pokemon *mon, u16 species)
 {
     if (species != SPECIES_NIDORAN_M && species != SPECIES_NIDORAN_F)
@@ -3973,6 +4062,11 @@ static void RemoveAndCreateMonMarkingsSprite(struct Pokemon *mon)
     DestroySprite(pssData->markingsSprite);
     FreeSpriteTilesByTag(30003);
     CreateMonMarkingsSprite(mon);
+}
+
+static void CreateLaserGrid(void)
+{
+	CreateSprite(&sSpriteTemplate_LaserGrid, 64, 152, 1);
 }
 
 static void CreateCaughtBallSprite(struct Pokemon *mon)
