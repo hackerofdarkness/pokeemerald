@@ -907,8 +907,8 @@ void LaunchAnimationTaskForFrontSprite(struct Sprite *sprite, u8 frontAnimId)
 
 void StartMonSummaryAnimation(struct Sprite *sprite, u8 frontAnimId)
 {
-    sUnknown_03001274 = TRUE;
-    sprite->callback = sMonAnimFunctions[frontAnimId];
+	sUnknown_03001274 = TRUE;
+	sprite->callback = sMonAnimFunctions[frontAnimId];
 }
 
 void LaunchAnimationTaskForBackSprite(struct Sprite *sprite, u8 backAnimSet)
@@ -1023,7 +1023,7 @@ static void sub_817F77C(struct Sprite *sprite)
     if (sUnknown_03001274 == TRUE)
     {
         if (!sprite->data[1])
-            sprite->hFlip = 1;
+            sprite->hFlip = 0;
         else
             sprite->hFlip = 0;
 
