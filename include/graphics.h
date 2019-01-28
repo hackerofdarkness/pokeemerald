@@ -4040,6 +4040,14 @@ extern const u32 gLaserGrid7_Gfx[];
 extern const u32 gLaserGrid8_Gfx[];
 extern const u32 gLaserGrid_Pal[];
 
+extern const u32 gSummaryMonIconsInfo1_Gfx[];
+extern const u32 gSummaryMonIconsInfo2_Gfx[];
+extern const u32 gSummaryMonTrainerMemo_Gfx[];
+extern const u32 gSummaryMonIconStats1_Gfx[];
+extern const u32 gSummaryMonIconStats2_Gfx[];
+extern const u32 gSummaryMonIconAbility_Gfx[];
+extern const u32 gSummaryIcons_Pal[];
+
 extern const u32 gBuyMenuFrame_Gfx[];
 extern const u32 gBuyMenuFrame_Tilemap[];
 extern const u32 gMenuMoneyGfx[];

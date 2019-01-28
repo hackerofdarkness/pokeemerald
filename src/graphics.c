@@ -1162,6 +1162,14 @@ const u32 gLaserGrid7_Gfx[] = INCBIN_U32("graphics/interface/laser_grid7.4bpp.lz
 const u32 gLaserGrid8_Gfx[] = INCBIN_U32("graphics/interface/laser_grid8.4bpp.lz");
 const u32 gLaserGrid_Pal[] = INCBIN_U32("graphics/interface/laser_grid.gbapal.lz");
 
+const u32 gSummaryMonIconsInfo1_Gfx[] = INCBIN_U32("graphics/interface/summary_icons_info1.4bpp.lz");
+const u32 gSummaryMonIconsInfo2_Gfx[] = INCBIN_U32("graphics/interface/summary_icons_info2.4bpp.lz");
+const u32 gSummaryMonTrainerMemo_Gfx[] = INCBIN_U32("graphics/interface/summary_trainer_memo.4bpp.lz");
+const u32 gSummaryMonIconStats1_Gfx[] = INCBIN_U32("graphics/interface/summary_stats1.4bpp.lz");
+const u32 gSummaryMonIconStats2_Gfx[] = INCBIN_U32("graphics/interface/summary_stats2.4bpp.lz");
+const u32 gSummaryMonIconAbility_Gfx[] = INCBIN_U32("graphics/interface/summary_ability.4bpp.lz");
+const u32 gSummaryIcons_Pal[] = INCBIN_U32("graphics/interface/summary_icons.gbapal.lz");
+
 const u32 gUnknown_08D97BEC[] = INCBIN_U32("graphics/interface/summary_frames.4bpp.lz");
 const u32 gUnknown_08D97CF4[] = INCBIN_U32("graphics/interface/summary_frames.gbapal.lz");
 
