@@ -4011,11 +4011,11 @@ extern const u32 gCreditsCopyrightEnd_Gfx[];
 extern const u8 gPokenavConditionMarker_Gfx[];
 extern const u16 gPokenavConditionMarker_Pal[];
 
-extern const u32 gUnknown_08D9862C[];
-extern const u32 gUnknown_08D98CC8[];
-extern const u32 gUnknown_08D987FC[];
-extern const u32 gUnknown_08D9898C[];
-extern const u32 gUnknown_08D98B28[];
+extern const u32 gSummaryLayout_Tilemap[];
+extern const u32 gSummaryInfo_Tilemap[];
+extern const u32 gSummarySkills_Tilemap[];
+extern const u32 gSummaryMoves_Tilemap[];
+extern const u32 gSummaryContest_Tilemap[];
 extern const u32 gUnknown_08D9853C[];
 extern const u16 gUnknown_08D85620[];
 extern const u16 gSummaryScreenWindow_Tilemap[];
@@ -4023,7 +4023,7 @@ extern const u32 gMoveTypes_Pal[];
 extern const u32 gUnknown_08D97D0C[];
 
 extern const u16 gSummaryScreenPowAcc_Tilemap[];
-extern const u16 gUnknown_08DC3C34[];
+extern const u16 gSummaryJamApp_Tilemap[];
 
 extern const u32 gMoveTypes_Gfx[];
 extern const u32 gUnknown_08D97BEC[];

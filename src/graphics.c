@@ -1175,12 +1175,12 @@ const u32 gUnknown_08D97CF4[] = INCBIN_U32("graphics/interface/summary_frames.gb
 
 const u32 gUnknown_08D97D0C[] = INCBIN_U32("graphics/interface/status_screen.4bpp.lz");
 const u32 gUnknown_08D9853C[] = INCBIN_U32("graphics/interface/status_screen.gbapal.lz");
-const u32 gUnknown_08D9862C[] = INCBIN_U32("graphics/interface/status_screen.bin.lz");
+const u32 gSummaryLayout_Tilemap[] = INCBIN_U32("graphics/interface/status_screen.bin.lz");
 
-const u32 gUnknown_08D987FC[] = INCBIN_U32("graphics/interface/status_tilemap1.bin.lz");
-const u32 gUnknown_08D9898C[] = INCBIN_U32("graphics/interface/status_tilemap2.bin.lz");
-const u32 gUnknown_08D98B28[] = INCBIN_U32("graphics/interface/status_tilemap3.bin.lz");
-const u32 gUnknown_08D98CC8[] = INCBIN_U32("graphics/interface/status_tilemap0.bin.lz");
+const u32 gSummarySkills_Tilemap[] = INCBIN_U32("graphics/interface/status_tilemap1.bin.lz");
+const u32 gSummaryMoves_Tilemap[] = INCBIN_U32("graphics/interface/status_tilemap2.bin.lz");
+const u32 gSummaryContest_Tilemap[] = INCBIN_U32("graphics/interface/status_tilemap3.bin.lz");
+const u32 gSummaryInfo_Tilemap[] = INCBIN_U32("graphics/interface/status_tilemap0.bin.lz");
 
 const u32 gBagMaleTiles[] = INCBIN_U32("graphics/misc/bag_male.4bpp.lz");
 const u32 gBagFemaleTiles[] = INCBIN_U32("graphics/misc/bag_female.4bpp.lz");
@@ -1314,7 +1314,7 @@ const u32 gPokedexSearch2_Tilemap[] = INCBIN_U32("graphics/pokedex/search2.bin.l
 
 const u16 gSummaryScreenPowAcc_Tilemap[] = INCBIN_U16("graphics/interface/powacc_tilemap.bin");
 
-const u16 gUnknown_08DC3C34[] = INCBIN_U16("graphics/interface/unk_tilemap.bin"); // probably trade summary screen related?
+const u16 gSummaryJamApp_Tilemap[] = INCBIN_U16("graphics/interface/unk_tilemap.bin"); // probably trade summary screen related?
 
 const u16 gSummaryScreenWindow_Tilemap[] = INCBIN_U16("graphics/interface/summary.bin");
 
