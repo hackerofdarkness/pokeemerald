@@ -138,30 +138,30 @@ static bool8 SummaryScreen_DecompressGraphics(void);
 static void CopyMonToSummaryStruct(struct Pokemon* a);
 static bool8 ExtractMonDataToSummaryStruct(struct Pokemon* a);
 static void sub_81C0348(void);
-static void sub_81C0484(u8 taskId);
-static void sub_81C0510(u8 taskId);
-static void sub_81C0604(u8 taskId, s8 a);
+static void resetMonDataForNextMon(u8 taskId);
+static void SummaryNavigationControls(u8 taskId);
+static void switchSummaryPage(u8 taskId, s8 a);
 static void sub_81C0704(u8 taskId);
 static s8 sub_81C08F8(s8 a);
 static s8 sub_81C09B4(s8 a);
 static bool8 sub_81C0A50(struct Pokemon* mon);
-static void sub_81C0A8C(u8 taskId, s8 a);
+static void ChangePageIndex(u8 taskId, s8 a);
 static void sub_81C0B8C(u8 taskId);
 static void sub_81C0C68(u8 taskId);
 static void sub_81C0CC4(u8 taskId);
 static void sub_81C0D44(u8 taskId);
 static void sub_81C0E24(void);
-static void sub_81C0E48(u8 taskId);
-static void sub_81C0F44(u8 taskId);
-static bool8 sub_81C1040(void);
+static void StartSelectMove(u8 taskId);
+static void InitiateSelectMoveControls(u8 taskId);
+static bool8 CheckForMoreThanOneMove(void);
 static void sub_81C1070(s16* a, s8 b, u8* c);
-static void sub_81C11F4(u8 a);
-static void sub_81C129C(u8 a);
-static void sub_81C12E4(u8 taskId);
-static void sub_81C13B0(u8 taskId, bool8 b);
+static void DeleteMoveSelectFrames(u8 a);
+static void InitiateMoveSwap(u8 a);
+static void SwapMoveControls(u8 taskId);
+static void CommitOrCancelMoveSwap(u8 taskId, bool8 b);
 static void SwapMonMoves(struct Pokemon *mon, u8 moveIndex1, u8 moveIndex2);
 static void SwapBoxMonMoves(struct BoxPokemon *mon, u8 moveIndex1, u8 moveIndex2);
-static void sub_81C171C(u8 taskId);
+static void SelectionFrameLearnMove(u8 taskId);
 static void sub_81C174C(u8 taskId);
 static bool8 sub_81C18A8(void);
 static void sub_81C18F4(u8 a);
@@ -176,7 +176,7 @@ static void sub_81C20F0(u8 taskId);
 static void sub_81C2194(u16 *a, u16 b, u8 c);
 static void sub_81C2228(struct Pokemon* mon);
 static void DrawExperienceProgressBar(struct Pokemon* mon);
-static void sub_81C240C(u16 a);
+static void PrintJamAndAppeal(u16 a);
 static void sub_81C2524(void);
 static void sub_81C2554(void);
 static void sub_81C25E8(void);
@@ -192,6 +192,7 @@ static void sub_81C2DE4(u8 a);
 static void sub_81C2E00(void);
 static void sub_81C2E40(u8 taskId);
 static void PrintSummaryIconsInfo(void);
+static void PrintSummaryLearnNewMove(void);
 static void PrintMovesSprites(void);
 static void PrintMonOTName(void);
 static void PrintMonOTID(void);
@@ -235,10 +236,10 @@ static void turnSpriteInvisible(u8 a, u8 b);
 static void sub_81C424C(void);
 static void sub_81C4280(void);
 static void sub_81C42C8(void);
-static void sub_81C43A0(void);
-static void sub_81C4420(void);
-static void sub_81C4484(void);
-static void sub_81C44F0(void);
+static void MonTypeIcon(void);
+static void PrintMoveTypes(void);
+static void PrintMoveContentTypes(void);
+static void CreateLearningNewMoveTypeIcon(void);
 static void sub_81C4568(u8 a, u8 b);
 static u8 sub_81C45F4(struct Pokemon *a, s16 *b);
 static u8 sub_81C47B4(struct Pokemon *unused);
@@ -250,10 +251,10 @@ static void CreateCaughtBallSprite(struct Pokemon *mon);
 static void CreateSetStatusSprite(void);
 static void CreateLaserGrid(void);
 static void CreateSummaryIcons(void);
-static void sub_81C4AF8(u8 a);
+static void CreateRedFrame(u8 a);
 static void sub_81C4BE4(struct Sprite *sprite);
-static void sub_81C4C60(u8 a);
-static void sub_81C4C84(u8 a);
+static void DestroyRedAndBlueFrame(u8 a);
+static void CreateBlueFrame(u8 a);
 static void sub_81C4D18(u8 a);
 
 // const rom data
@@ -491,19 +492,19 @@ static const struct WindowTemplate gUnknown_0861CC24[] =
 		.bg = 0,
 		.tilemapLeft = 16,
 		.tilemapTop = 2,
-		.width = 14,
+		.width = 4,
 		.height = 2,
 		.paletteNum = 1,
-		.baseBlock = 424,
+		.baseBlock = 420,
 	},
 	{//19 Lower name and gender
 		.bg = 0,
-		.tilemapLeft = 6,
-		.tilemapTop = 0,
-		.width = 0,
-		.height = 0,
-		.paletteNum = 6,
-		.baseBlock = 448,
+		.tilemapLeft = 20,
+		.tilemapTop = 2,
+		.width = 10,
+		.height = 2,
+		.paletteNum = 1,
+		.baseBlock = 444,
 	},
 	DUMMY_WIN_TEMPLATE
 };
@@ -516,7 +517,7 @@ static const struct WindowTemplate gUnknown_0861CCCC[] =
 		.width = 8,
 		.height = 1,
 		.paletteNum = 6,
-		.baseBlock = 449,
+		.baseBlock = 445,
 	},
 	{//ID numbers
 		.bg = 0,
@@ -525,7 +526,7 @@ static const struct WindowTemplate gUnknown_0861CCCC[] =
 		.width = 8,
 		.height = 10,
 		.paletteNum = 1,
-		.baseBlock = 471,
+		.baseBlock = 467,
 	},
 	{//Ability, change to item
 		.bg = 0,
@@ -534,7 +535,7 @@ static const struct WindowTemplate gUnknown_0861CCCC[] =
 		.width = 0,
 		.height = 0,
 		.paletteNum = 6,
-		.baseBlock = 485,
+		.baseBlock = 481,
 	},
 	{//Trainer Memo
 		.bg = 0,
@@ -543,7 +544,7 @@ static const struct WindowTemplate gUnknown_0861CCCC[] =
 		.width = 18,
 		.height = 6,
 		.paletteNum = 1,
-		.baseBlock = 557,
+		.baseBlock = 553,
 	},
 };
 static const struct WindowTemplate gUnknown_0861CCEC[] =
@@ -555,7 +556,7 @@ static const struct WindowTemplate gUnknown_0861CCEC[] =
 		.width = 18,
 		.height = 4,
 		.paletteNum = 1,
-		.baseBlock = 452,
+		.baseBlock = 464,
 	},
 	{//Ribbon string
 		.bg = 0,
@@ -564,7 +565,7 @@ static const struct WindowTemplate gUnknown_0861CCEC[] =
 		.width = 10,
 		.height = 2,
 		.paletteNum = 1,
-		.baseBlock = 530,
+		.baseBlock = 542,
 	},
 	{//Stat numbers left (HP, ATK & DEF)
 		.bg = 0,
@@ -573,7 +574,7 @@ static const struct WindowTemplate gUnknown_0861CCEC[] =
 		.width = 10,
 		.height = 8,
 		.paletteNum = 1,
-		.baseBlock = 550,
+		.baseBlock = 562,
 	},
 	{//Stat numbers right (SP.ATK, SP.DEF & SPEED)
 		.bg = 0,
@@ -582,7 +583,7 @@ static const struct WindowTemplate gUnknown_0861CCEC[] =
 		.width = 3,
 		.height = 6,
 		.paletteNum = 1,
-		.baseBlock = 640,
+		.baseBlock = 652,
 	},
 	{//Exp numbers
 		.bg = 0,
@@ -591,7 +592,7 @@ static const struct WindowTemplate gUnknown_0861CCEC[] =
 		.width = 8,
 		.height = 2,
 		.paletteNum = 1,
-		.baseBlock = 658,
+		.baseBlock = 670,
 	},
 };
 static const struct WindowTemplate gUnknown_0861CD14[] =
@@ -603,7 +604,7 @@ static const struct WindowTemplate gUnknown_0861CD14[] =
 		.width = 10,
 		.height = 18,
 		.paletteNum = 1,
-		.baseBlock = 452,
+		.baseBlock = 464,
 	},
 	{//PP Numbers
 		.bg = 0,
@@ -612,7 +613,7 @@ static const struct WindowTemplate gUnknown_0861CD14[] =
 		.width = 6,
 		.height = 10,
 		.paletteNum = 8,
-		.baseBlock = 562,
+		.baseBlock = 574,
 	},
 	{//Move description text
 		.bg = 0,
@@ -621,7 +622,7 @@ static const struct WindowTemplate gUnknown_0861CD14[] =
 		.width = 20,
 		.height = 4,
 		.paletteNum = 6,
-		.baseBlock = 642,
+		.baseBlock = 654,
 	},
 };
 static const u8 sTextColors_861CD2C[][3] =
@@ -1449,11 +1450,11 @@ void ShowPokemonSummaryScreen(u8 mode, void *mons, u8 monIndex, u8 maxMonIndex, 
 	case PSS_MODE_NORMAL:
 	case PSS_MODE_BOX:
 		pssData->minPageIndex = 0;
-		pssData->maxPageIndex = 3;
+		pssData->maxPageIndex = 2;
 		break;
 	case PSS_MODE_UNK1:
 		pssData->minPageIndex = 0;
-		pssData->maxPageIndex = 3;
+		pssData->maxPageIndex = 2;
 		pssData->unk40C8 = TRUE;
 		break;
 	case PSS_MODE_SELECT_MOVE:
@@ -1610,9 +1611,9 @@ static bool8 SummaryScreen_LoadGraphics(void)
 		break;
 	case 22:
 		if (pssData->mode != PSS_MODE_SELECT_MOVE)
-			CreateTask(sub_81C0510, 0);
+			CreateTask(SummaryNavigationControls, 0);
 		else
-			CreateTask(sub_81C171C, 0);
+			CreateTask(SelectionFrameLearnMove, 0);
 		gMain.state++;
 		break;
 	case 23:
@@ -1860,7 +1861,7 @@ static void sub_81C0348(void)
 	}
 	else
 	{
-		sub_81C240C(pssData->summary.moves[pssData->firstMoveIndex]);
+		PrintJamAndAppeal(pssData->summary.moves[pssData->firstMoveIndex]);
 		sub_81C2194(pssData->bgTilemapBuffers[PSS_PAGE_BATTLE_MOVES][0], 3, 0);
 		sub_81C2194(pssData->bgTilemapBuffers[PSS_PAGE_CONTEST_MOVES][0], 1, 0);
 		SetBgTilemapBuffer(1, pssData->bgTilemapBuffers[PSS_PAGE_CONTEST_MOVES][0]);
@@ -1888,13 +1889,13 @@ static void sub_81C0434(void)
 	Free(pssData);
 }
 
-static void sub_81C044C(u8 taskId)
+static void FadeMonPalette(u8 taskId)
 {
 	BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, 0);
-	gTasks[taskId].func = sub_81C0484;
+	gTasks[taskId].func = resetMonDataForNextMon;
 }
 
-static void sub_81C0484(u8 taskId)
+static void resetMonDataForNextMon(u8 taskId)
 {
 	if (sub_81221EC() != TRUE && !gPaletteFade.active)
 	{
@@ -1912,25 +1913,25 @@ static void sub_81C0484(u8 taskId)
 	}
 }
 
-static void sub_81C0510(u8 taskId)
+static void SummaryNavigationControls(u8 taskId)
 {
 	if (sub_81221EC() != TRUE && !gPaletteFade.active)
 	{
 		if (gMain.newKeys & DPAD_UP)
 		{
-			sub_81C0604(taskId, -1);
+			switchSummaryPage(taskId, -1);
 		}
 		else if (gMain.newKeys & DPAD_DOWN)
 		{
-			sub_81C0604(taskId, 1);
+			switchSummaryPage(taskId, 1);
 		}
 		else if ((gMain.newKeys & DPAD_LEFT) || GetLRKeysState() == 1)
 		{
-			sub_81C0A8C(taskId, -1);
+			ChangePageIndex(taskId, -1);
 		}
 		else if ((gMain.newKeys & DPAD_RIGHT) || GetLRKeysState() == 2)
 		{
-			sub_81C0A8C(taskId, 1);
+			ChangePageIndex(taskId, 1);
 		}
 		else if (gMain.newKeys & A_BUTTON)
 		{
@@ -1940,12 +1941,12 @@ static void sub_81C0510(u8 taskId)
 				{
 					sub_81C48F0();
 					PlaySE(SE_SELECT);
-					sub_81C044C(taskId);
+					FadeMonPalette(taskId);
 				}
 				else
 				{
 					PlaySE(SE_SELECT);
-					sub_81C0E48(taskId);
+					StartSelectMove(taskId);
 				}
 			}
 		}
@@ -1953,12 +1954,12 @@ static void sub_81C0510(u8 taskId)
 		{
 			sub_81C48F0();
 			PlaySE(SE_SELECT);
-			sub_81C044C(taskId);
+			FadeMonPalette(taskId);
 		}
 	}
 }
 
-static void sub_81C0604(u8 taskId, s8 a)
+static void switchSummaryPage(u8 taskId, s8 a)
 {
 	s8 r4_2;
 
@@ -2069,7 +2070,7 @@ static void sub_81C0704(u8 taskId)
 		if (sub_81221EC() == 0 && FuncIsActiveTask(sub_81C20F0) == 0)
 		{
 			data[0] = 0;
-			gTasks[taskId].func = sub_81C0510;
+			gTasks[taskId].func = SummaryNavigationControls;
 		}
 		return;
 	}
@@ -2142,7 +2143,7 @@ static bool8 sub_81C0A50(struct Pokemon* mon)
 		return FALSE;
 }
 
-static void sub_81C0A8C(u8 taskId, s8 b)
+static void ChangePageIndex(u8 taskId, s8 b)
 {
 	struct PokeSummary *summary = &pssData->summary;
 	s16 *data = gTasks[taskId].data;
@@ -2264,13 +2265,13 @@ static void sub_81C0E24(void)
 		DrawExperienceProgressBar(&pssData->currentMon);
 }
 
-static void sub_81C0E48(u8 taskId)
+static void StartSelectMove(u8 taskId)
 {
 	u16 move;
 	pssData->firstMoveIndex = 0;
 	pssData->detailedMoveCheck = 1;
 	move = pssData->summary.moves[pssData->firstMoveIndex];
-	ClearWindowTilemap(0x13);
+	ClearWindowTilemap(0x12);
 	if (gSprites[pssData->spriteIds[2]].invisible == 0)
 		ClearWindowTilemap(0xD);
 	sub_81C1DA4(9, -3);
@@ -2298,15 +2299,15 @@ static void sub_81C0E48(u8 taskId)
 	sub_81C2194(pssData->bgTilemapBuffers[PSS_PAGE_CONTEST_MOVES][0], 1, 0);
 	PrintMoveDetails(move);
 	PrintNewMoveDetailsOrCancelText();
-	sub_81C44F0();
+	CreateLearningNewMoveTypeIcon();
 	schedule_bg_copy_tilemap_to_vram(0);
 	schedule_bg_copy_tilemap_to_vram(1);
 	schedule_bg_copy_tilemap_to_vram(2);
-	sub_81C4AF8(8);
-	gTasks[taskId].func = sub_81C0F44;
+	CreateRedFrame(8);
+	gTasks[taskId].func = InitiateSelectMoveControls;
 }
 
-static void sub_81C0F44(u8 taskId)
+static void InitiateSelectMoveControls(u8 taskId)
 {
 	u8 id = taskId;
 	s16 *data = gTasks[taskId].data;
@@ -2328,28 +2329,28 @@ static void sub_81C0F44(u8 taskId)
 			if (pssData->unk40C8 == TRUE
 				|| (pssData->newMove == MOVE_NONE && pssData->firstMoveIndex == MAX_MON_MOVES))
 			{
-				PlaySE(SE_SELECT);
-				sub_81C11F4(taskId);
+				PlaySE(SE_SELECT); //When you press A on the cancel option.
+				DeleteMoveSelectFrames(taskId);
 			}
-			else if (sub_81C1040() == TRUE)
+			else if (CheckForMoreThanOneMove() == TRUE)
 			{
 				PlaySE(SE_SELECT);
-				sub_81C129C(taskId);
+				InitiateMoveSwap(taskId);
 			}
-			else
+			else //Trying to swap moves when there is only 1 move.
 			{
-				PlaySE(SE_HAZURE);
+				PlaySE(SE_HAZURE); 
 			}
 		}
 		else if (gMain.newKeys & B_BUTTON)
 		{
 			PlaySE(SE_SELECT);
-			sub_81C11F4(id);
+			DeleteMoveSelectFrames(id);
 		}
 	}
 }
 
-static bool8 sub_81C1040(void)
+static bool8 CheckForMoreThanOneMove(void)
 {
 	u8 i;
 	for (i = 1; i < MAX_MON_MOVES; i++)
@@ -2384,7 +2385,7 @@ static void sub_81C1070(s16 *a, s8 b, u8 *c)
 		if (move != 0)
 			break;
 	}
-	sub_81C240C(move);
+	PrintJamAndAppeal(move);
 	schedule_bg_copy_tilemap_to_vram(1);
 	schedule_bg_copy_tilemap_to_vram(2);
 	PrintMoveDetails(move);
@@ -2412,9 +2413,10 @@ static void sub_81C1070(s16 *a, s8 b, u8 *c)
 		sub_81C4D18(18);
 }
 
-static void sub_81C11F4(u8 taskId)
+static void DeleteMoveSelectFrames(u8 taskId)
 {
-	sub_81C4C60(8);
+	DestroyRedAndBlueFrame(8);
+	DestroyRedAndBlueFrame(10);
 	ClearWindowTilemap(6);
 	PutWindowTilemap(5);
 	PrintMoveDetails(0);
@@ -2444,18 +2446,17 @@ static void sub_81C11F4(u8 taskId)
 	schedule_bg_copy_tilemap_to_vram(0);
 	schedule_bg_copy_tilemap_to_vram(1);
 	schedule_bg_copy_tilemap_to_vram(2);
-	gTasks[taskId].func = sub_81C0510;
+	gTasks[taskId].func = SummaryNavigationControls;
 }
 
-static void sub_81C129C(u8 taskId)
+static void InitiateMoveSwap(u8 taskId)
 {
 	pssData->secondMoveIndex = pssData->firstMoveIndex;
-	sub_81C4C84(1);
-	sub_81C4AF8(18);
-	gTasks[taskId].func = sub_81C12E4;
+	CreateBlueFrame(1);
+	gTasks[taskId].func = SwapMoveControls;
 }
 
-static void sub_81C12E4(u8 taskId)
+static void SwapMoveControls(u8 taskId)
 {
 	s16* data = gTasks[taskId].data;
 
@@ -2475,27 +2476,27 @@ static void sub_81C12E4(u8 taskId)
 		{
 			if (pssData->firstMoveIndex == pssData->secondMoveIndex)
 			{
-				sub_81C13B0(taskId, 0);
+				CommitOrCancelMoveSwap(taskId, 0);
 			}
 			else
 			{
-				sub_81C13B0(taskId, 1);
+				CommitOrCancelMoveSwap(taskId, 1);
 			}
 		}
 		else if (gMain.newKeys & B_BUTTON)
 		{
-			sub_81C13B0(taskId, 0);
+			CommitOrCancelMoveSwap(taskId, 0);
 		}
 	}
 }
 
-static void sub_81C13B0(u8 taskId, bool8 b)
+static void CommitOrCancelMoveSwap(u8 taskId, bool8 b)
 {
 	u16 move;
 
 	PlaySE(SE_SELECT);
-	sub_81C4C84(0);
-	sub_81C4C60(18);
+	//CreateBlueFrame(0);
+	DestroyRedAndBlueFrame(10);
 
 	if (b == TRUE)
 	{
@@ -2517,10 +2518,10 @@ static void sub_81C13B0(u8 taskId, bool8 b)
 
 	move = pssData->summary.moves[pssData->firstMoveIndex];
 	PrintMoveDetails(move);
-	sub_81C240C(move);
+	PrintJamAndAppeal(move);
 	schedule_bg_copy_tilemap_to_vram(1);
 	schedule_bg_copy_tilemap_to_vram(2);
-	gTasks[taskId].func = sub_81C0F44;
+	gTasks[taskId].func = InitiateSelectMoveControls;
 }
 
 static void SwapMonMoves(struct Pokemon *mon, u8 moveIndex1, u8 moveIndex2)
@@ -2593,10 +2594,10 @@ static void SwapBoxMonMoves(struct BoxPokemon *mon, u8 moveIndex1, u8 moveIndex2
 	summary->ppBonuses = ppBonuses;
 }
 
-static void sub_81C171C(u8 taskId)
+static void SelectionFrameLearnMove(u8 taskId)
 {
-	sub_81C44F0();
-	sub_81C4AF8(8);
+	CreateLearningNewMoveTypeIcon();
+	CreateRedFrame(8);
 	gTasks[taskId].func = sub_81C174C;
 }
 
@@ -2620,11 +2621,11 @@ static void sub_81C174C(u8 taskId)
 			}
 			else if (gMain.newKeys & DPAD_LEFT || GetLRKeysState() == 1)
 			{
-				sub_81C0A8C(taskId, -1);
+				ChangePageIndex(taskId, -1);
 			}
 			else if (gMain.newKeys & DPAD_RIGHT || GetLRKeysState() == 2)
 			{
-				sub_81C0A8C(taskId, 1);
+				ChangePageIndex(taskId, 1);
 			}
 			else if (gMain.newKeys & A_BUTTON)
 			{
@@ -2634,7 +2635,7 @@ static void sub_81C174C(u8 taskId)
 					PlaySE(SE_SELECT);
 					gUnknown_0203CF21 = pssData->firstMoveIndex;
 					gSpecialVar_0x8005 = gUnknown_0203CF21;
-					sub_81C044C(taskId);
+					FadeMonPalette(taskId);
 				}
 				else
 				{
@@ -2649,7 +2650,7 @@ static void sub_81C174C(u8 taskId)
 				PlaySE(SE_SELECT);
 				gUnknown_0203CF21 = 4;
 				gSpecialVar_0x8005 = 4;
-				sub_81C044C(taskId);
+				FadeMonPalette(taskId);
 			}
 		}
 	}
@@ -2705,7 +2706,7 @@ static void sub_81C1940(u8 taskId)
 					ClearWindowTilemap(13);
 				move = pssData->summary.moves[pssData->firstMoveIndex];
 				gTasks[taskId].func = sub_81C174C;
-				sub_81C0A8C(taskId, -1);
+				ChangePageIndex(taskId, -1);
 				sub_81C1DA4(9, -2);
 				sub_81C1EFC(9, -2, move);
 			}
@@ -2719,7 +2720,7 @@ static void sub_81C1940(u8 taskId)
 					ClearWindowTilemap(13);
 				move = pssData->summary.moves[pssData->firstMoveIndex];
 				gTasks[taskId].func = sub_81C174C;
-				sub_81C0A8C(taskId, 1);
+				ChangePageIndex(taskId, 1);
 				sub_81C1DA4(9, -2);
 				sub_81C1EFC(9, -2, move);
 			}
@@ -2762,10 +2763,10 @@ static void sub_81C1BA0(void)
 		}
 		else if (i > pssData->maxPageIndex)
 		{
-			alloced[j + 0] = 0x4A;
-			alloced[j + 1] = 0x4A;
-			alloced[j + 8] = 0x5A;
-			alloced[j + 9] = 0x5A;
+			alloced[j + 0] = 0x47;
+			alloced[j + 1] = 0x47;
+			alloced[j + 8] = 0x57;
+			alloced[j + 9] = 0x57;
 		}
 		else if (i < pssData->currPageIndex)
 		{
@@ -2884,7 +2885,7 @@ static void sub_81C1E20(u8 taskId)
 		{
 			if (!gSprites[pssData->spriteIds[2]].invisible)
 				PutWindowTilemap(13);
-			PutWindowTilemap(19);
+			PutWindowTilemap(18);
 		}
 		//schedule_bg_copy_tilemap_to_vram(0);
 		DestroyTask(taskId);
@@ -2929,7 +2930,7 @@ static void sub_81C1F80(u8 taskId)
 		{
 			if (pssData->currPageIndex == 3 && FuncIsActiveTask(sub_81C0B8C) == 0)
 				PutWindowTilemap(15);
-			sub_81C240C(data[2]);
+			PrintJamAndAppeal(data[2]);
 		}
 		else
 		{
@@ -2937,7 +2938,7 @@ static void sub_81C1F80(u8 taskId)
 			{
 				PutWindowTilemap(13);
 			}
-			PutWindowTilemap(19);
+			PutWindowTilemap(18);
 		}
 		schedule_bg_copy_tilemap_to_vram(0);
 		DestroyTask(taskId);
@@ -3016,14 +3017,13 @@ static void sub_81C2194(u16 *output, u16 palette, bool8 c)
 			output[var + i + 0x1E0] = gSummaryScreenWindow_Tilemap[i + 225] + palette;
 			output[var + i + 0x200] = gSummaryScreenWindow_Tilemap[i + 240] + palette;
 			output[var + i + 0x220] = gSummaryScreenWindow_Tilemap[i + 255] + palette;
-			output[var + i + 0x240] = gSummaryScreenWindow_Tilemap[i + 270] + palette;
 		}
 	}
 	else
 	{
 		for (i = 0; i < 15; i++)
 		{
-			output[var + i] = gSummaryScreenWindow_Tilemap[i];
+			output[var + i] = gSummaryScreenWindow_Tilemap[i + 270];
 			output[var + i + 0x20] = gSummaryScreenWindow_Tilemap[i + 285];
 			output[var + i + 0x40] = gSummaryScreenWindow_Tilemap[i + 300];
 			output[var + i + 0x60] = gSummaryScreenWindow_Tilemap[i + 315];
@@ -3041,7 +3041,6 @@ static void sub_81C2194(u16 *output, u16 palette, bool8 c)
 			output[var + i + 0x1E0] = gSummaryScreenWindow_Tilemap[i + 495];
 			output[var + i + 0x200] = gSummaryScreenWindow_Tilemap[i + 510];
 			output[var + i + 0x220] = gSummaryScreenWindow_Tilemap[i + 525];
-			output[var + i + 0x240] = gSummaryScreenWindow_Tilemap[i + 540];
 		}
 	}
 }
@@ -3112,7 +3111,7 @@ static void DrawExperienceProgressBar(struct Pokemon *unused)
 		schedule_bg_copy_tilemap_to_vram(2);
 }
 
-static void sub_81C240C(u16 move)
+static void PrintJamAndAppeal(u16 move)
 {
 	u16 *tilemap = pssData->bgTilemapBuffers[PSS_PAGE_CONTEST_MOVES][1];
 	u8 i;
@@ -3234,7 +3233,7 @@ static void sub_81C2628(void)
 	StringAppend(gStringVar1, gStringVar2);
 	SummaryScreen_PrintTextOnWindow(18, gStringVar1, 2, 0, 0, 2);
 	GetMonNickname(mon, gStringVar1);
-	SummaryScreen_PrintTextOnWindow(18, gStringVar1, 36, 0, 0, 2);
+	SummaryScreen_PrintTextOnWindow(19, gStringVar1, 0, 0, 0, 2);
 	StringCopy(&strArray[1], &gSpeciesNames[summary->species2][0]);
 	SummaryScreen_PrintTextOnWindow(17, &strArray[1], 2, 16, 0, 0);
 	sub_81C27DC(mon, summary->species2);
@@ -3259,10 +3258,10 @@ static void sub_81C27DC(struct Pokemon *mon, u16 species)
 		switch (gender)
 		{
 		case MON_MALE:
-			SummaryScreen_PrintTextOnWindow(18, gText_MaleSymbol, 102, 0, 0, 1);
+			SummaryScreen_PrintTextOnWindow(19, gText_MaleSymbol, 70, 0, 0, 1);
 			break;
 		case MON_FEMALE:
-			SummaryScreen_PrintTextOnWindow(18, gText_FemaleSymbol, 102, 0, 0, 4);
+			SummaryScreen_PrintTextOnWindow(19, gText_FemaleSymbol, 70, 0, 0, 4);
 			break;
 		}
 	}
@@ -3527,30 +3526,12 @@ static void PrintSummaryIconsInfo(void)
 {
 	if (sub_81A6BF4() != TRUE && sub_81B9E94() != TRUE)
 	{	
-		if (pssData->currPageIndex == 0)
-		{
 			gSprites[pssData->summarySpriteIds[0]].invisible = FALSE;
 			gSprites[pssData->summarySpriteIds[1]].invisible = FALSE;
 			gSprites[pssData->summarySpriteIds[2]].invisible = FALSE;
 			gSprites[pssData->summarySpriteIds[3]].invisible = TRUE;
 			gSprites[pssData->summarySpriteIds[4]].invisible = TRUE;
 			gSprites[pssData->summarySpriteIds[5]].invisible = TRUE;
-		}
-		else
-		{
-			gSprites[pssData->summarySpriteIds[0]].invisible = TRUE;
-			gSprites[pssData->summarySpriteIds[1]].invisible = TRUE;
-			gSprites[pssData->summarySpriteIds[2]].invisible = TRUE;
-			gSprites[pssData->summarySpriteIds[3]].invisible = TRUE;
-			gSprites[pssData->summarySpriteIds[4]].invisible = TRUE;
-			gSprites[pssData->summarySpriteIds[5]].invisible = TRUE;
-			gSprites[pssData->summarySpriteIds[6]].invisible = FALSE;
-			gSprites[pssData->summaryLaserSpriteIds[31]].invisible = TRUE;
-			gSprites[pssData->summaryLaserSpriteIds[32]].invisible = TRUE;
-			gSprites[pssData->summaryLaserSpriteIds[33]].invisible = TRUE;
-			gSprites[pssData->summaryLaserSpriteIds[34]].invisible = TRUE;
-			gSprites[pssData->summaryLaserSpriteIds[35]].invisible = TRUE;
-		}
 	}
 }
 
@@ -3958,6 +3939,7 @@ static void sub_81C3984(void)
 	PrintMoveNameAndPP(1);
 	PrintMoveNameAndPP(2);
 	PrintMoveNameAndPP(3);
+	PrintSummaryLearnNewMove();
 
 	if (pssData->mode == PSS_MODE_SELECT_MOVE)
 	{
@@ -3996,10 +3978,13 @@ static void sub_81C39F0(u8 taskId)
 		PrintMoveNameAndPP(3);
 		break;
 	case 5:
+		PrintSummaryLearnNewMove();
+		break;
+	case 6:
 		if (pssData->mode == PSS_MODE_SELECT_MOVE)
 			PrintNewMoveDetailsOrCancelText();
 		break;
-	case 6:
+	case 7:
 		if (pssData->mode == PSS_MODE_SELECT_MOVE)
 		{
 			if (pssData->firstMoveIndex == MAX_MON_MOVES)
@@ -4008,14 +3993,14 @@ static void sub_81C39F0(u8 taskId)
 				data[1] = pssData->summary.moves[pssData->firstMoveIndex];
 		}
 		break;
-	case 7:
+	case 8:
 		if (pssData->mode == PSS_MODE_SELECT_MOVE)
 		{
 			if (pssData->newMove != MOVE_NONE || pssData->firstMoveIndex != MAX_MON_MOVES)
 				PrintMoveDetails(data[1]);
 		}
 		break;
-	case 8:
+	case 9:
 		DestroyTask(taskId);
 		return;
 	}
@@ -4291,16 +4276,38 @@ static void sub_81C4280(void)
 	switch (pssData->currPageIndex)
 	{
 	case 0:
-		sub_81C43A0();
+		MonTypeIcon();
+		break;
+	case 1:
+		PrintSummaryLearnNewMove();
 		break;
 	case 2:
-		sub_81C4420();
-		sub_81C44F0();
+		PrintMoveTypes();
+		CreateLearningNewMoveTypeIcon();
 		break;
 	case 3:
-		sub_81C4484();
-		sub_81C44F0();
+		PrintMoveContentTypes();
+		CreateLearningNewMoveTypeIcon();
 		break;
+	}
+}
+
+static void PrintSummaryLearnNewMove(void)
+{
+	if (pssData->mode == PSS_MODE_SELECT_MOVE)
+	{ 
+		gSprites[pssData->summarySpriteIds[0]].invisible = TRUE;
+		gSprites[pssData->summarySpriteIds[1]].invisible = TRUE;
+		gSprites[pssData->summarySpriteIds[2]].invisible = TRUE;
+		gSprites[pssData->summarySpriteIds[3]].invisible = TRUE;
+		gSprites[pssData->summarySpriteIds[4]].invisible = TRUE;
+		gSprites[pssData->summarySpriteIds[5]].invisible = TRUE;
+		gSprites[pssData->summarySpriteIds[6]].invisible = FALSE;
+		gSprites[pssData->summaryLaserSpriteIds[31]].invisible = TRUE;
+		gSprites[pssData->summaryLaserSpriteIds[32]].invisible = TRUE;
+		gSprites[pssData->summaryLaserSpriteIds[33]].invisible = TRUE;
+		gSprites[pssData->summaryLaserSpriteIds[34]].invisible = TRUE;
+		gSprites[pssData->summaryLaserSpriteIds[35]].invisible = TRUE;
 	}
 }
 
@@ -4327,12 +4334,12 @@ static void SetMoveTypeSpritePosAndType(u8 typeId, u8 x, u8 y, u8 spriteArrayId)
 	turnSpriteInvisible(spriteArrayId, FALSE);
 }
 
-static void sub_81C43A0(void) //Type placement icon.
+static void MonTypeIcon(void) //Type placement icon.
 {
 	struct PokeSummary *summary = &pssData->summary;
 	if (summary->isEgg)
 	{
-		SetMoveTypeSpritePosAndType(TYPE_MYSTERY, 136, 48, 3);
+		SetMoveTypeSpritePosAndType(TYPE_MYSTERY, 66, 54, 3);
 		turnSpriteInvisible(4, TRUE);
 	}
 	else
@@ -4350,9 +4357,10 @@ static void sub_81C43A0(void) //Type placement icon.
 	}
 }
 
-static void sub_81C4420(void)
+static void PrintMoveTypes(void)
 {
 	u8 i;
+	//pssData->summary.moves
 	struct PokeSummary *summary = &pssData->summary;
 	for (i = 0; i < MAX_MON_MOVES; i++)
 	{
@@ -4363,7 +4371,7 @@ static void sub_81C4420(void)
 	}
 }
 
-static void sub_81C4484(void)
+static void PrintMoveContentTypes(void)
 {
 	u8 i;
 	struct PokeSummary *summary = &pssData->summary;
@@ -4376,7 +4384,7 @@ static void sub_81C4484(void)
 	}
 }
 
-static void sub_81C44F0(void)
+static void CreateLearningNewMoveTypeIcon(void)
 {
 	if (pssData->newMove == MOVE_NONE)
 	{
@@ -4385,7 +4393,7 @@ static void sub_81C44F0(void)
 	else
 	{
 		if (pssData->currPageIndex == 2)
-			SetMoveTypeSpritePosAndType(gBattleMoves[pssData->newMove].type, 85, 96, 7);
+			SetMoveTypeSpritePosAndType(gBattleMoves[pssData->newMove].type, 18, 141, 7);
 		else
 			SetMoveTypeSpritePosAndType(NUMBER_OF_MON_TYPES + gContestMoves[pssData->newMove].contestCategory, 85, 96, 7);
 	}
@@ -4482,7 +4490,7 @@ static void sub_81C4778(void)
 		}
 	}
 }
-
+//Creates mon sprite
 static u8 sub_81C47B4(struct Pokemon *unused)
 {
 	struct PokeSummary *summary = &pssData->summary;
@@ -4498,6 +4506,7 @@ static u8 sub_81C47B4(struct Pokemon *unused)
 
 	return spriteId;
 }
+//Create mon icon sprite
 
 static void sub_81C4844(struct Sprite *sprite)
 {
@@ -4675,17 +4684,17 @@ static void CreateSetStatusSprite(void)
 	}
 }
 
-static void sub_81C4AF8(u8 a0)
+static void CreateRedFrame(u8 a0)
 {
 	u8 i;
-	u8 *spriteIds = &pssData->spriteIds[a0];
+	u8 *spriteIds = &pssData->spriteIds[8];
 
 	if (pssData->currPageIndex > 1)
 	{
 		u8 subsprite = 0;
-		if (a0 == 8)
+		//if (a0 == 8)
 		{
-			subsprite = 1;
+			//subsprite = 1;
 		}
 
 		for (i = 0; i < 2; i++)
@@ -4700,7 +4709,7 @@ static void sub_81C4AF8(u8 a0)
 				StartSpriteAnim(&gSprites[spriteIds[i]], 1);
 			}
 			gSprites[spriteIds[i]].callback = sub_81C4BE4;
-			gSprites[spriteIds[i]].data[0] = a0;
+			gSprites[spriteIds[i]].data[0] = 8;
 			gSprites[spriteIds[i]].data[1] = 0;
 		}
 	}
@@ -4708,12 +4717,12 @@ static void sub_81C4AF8(u8 a0)
 
 static void sub_81C4BE4(struct Sprite *sprite)
 {
-	if (sprite->animNum < 2)
+	if (sprite->animNum < 1)
 	{
 		sprite->data[1] = (sprite->data[1] + 1) & 0x1F;
 		if (sprite->data[1] > 24)
 		{
-			sprite->invisible = TRUE;
+			sprite->invisible = FALSE;
 		}
 		else
 		{
@@ -4736,19 +4745,19 @@ static void sub_81C4BE4(struct Sprite *sprite)
 	}
 }
 
-static void sub_81C4C60(u8 a0)
+static void DestroyRedAndBlueFrame(u8 a0)
 {
 	u8 i;
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < 2; i++)
 	{
 		DestroySpriteInArray(a0 + i);
 	}
 }
 
-static void sub_81C4C84(u8 a0)
+static void CreateBlueFrame(u8 a0)
 {
 	u8 i;
-	u8 *spriteIds = &pssData->spriteIds[8];
+	u8 *spriteIds = &pssData->spriteIds[10];
 	a0 *= 3;
 
 	for (i = 0; i < 2; i++)
